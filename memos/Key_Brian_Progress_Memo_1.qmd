@@ -1,0 +1,47 @@
+---
+title: "Progress Memo 1"
+subtitle: |
+  | Final Project 
+  | Data Science 2 with R (STAT 301-2)
+author: "Brian Key"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    theme:
+      dark: darkly
+    
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+
+::: {.callout-tip icon=false}
+[Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
+:::
+
+## Data source
+
+Blah blah blah^[an example of footnote --- [content in margins](https://quarto.org/docs/blog/posts/2022-02-17-advanced-layout/)]
+
+## Why this data
+
+Blah blah blah^[another footnote]
+
+## Data quality & complexity check
+
+Blah blah blah
+
+## Potential data issues
+
+Blah blah blah
+
+## Misc
+
+Blah Blah
