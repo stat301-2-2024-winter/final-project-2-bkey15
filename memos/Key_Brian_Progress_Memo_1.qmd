@@ -23,6 +23,8 @@ citation-location: margin
 ---
 
 ::: {.callout-tip icon=false}
+## Github Repo Link
+
 [Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
 :::
 
