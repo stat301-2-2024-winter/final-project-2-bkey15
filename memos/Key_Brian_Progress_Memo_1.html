@@ -3120,7 +3120,7 @@ Warning
 <div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup> See the V-Dem Institute’s <a href="https://github.com/vdeminstitute/vdemdata">Github repo</a> for installation instructions.</p></li><li id="fn2"><p><sup>2</sup> See the link in the foregoing sentence.</p></li><li id="fn3"><p><sup>3</sup> The country codes, specifically, are <a href="https://correlatesofwar.org/">Correlates of War (COW)</a> IDs.</p></li></div></section>
 <section id="why-this-data-prediction-problem" class="level2">
 <h2 class="anchored" data-anchor-id="why-this-data-prediction-problem">Why this data &amp; prediction problem</h2>
-<p>In brief, much of my dissertation relies on the use of a dependent variable measuring human rights respect. Hitherto, I have depended almost exclusively on Fariss’s Human Rights (HR) Scores, but he has not updated his dataset since 2020. In my previous final project, I identified a “raw” form of the physical violence index, derived from a simple average of the freedoms from political killings and torture indicators, as perhaps the best available substitute for HR Scores. However, for this project, I would like to try my hand at predicting the missing data in HR Scores—namely, all country-year observations 2021-2023, the most recent full years since 2020—with the raw physical violence index as an included covariate.</p>
+<p>In brief, much of my dissertation relies on the use of a dependent variable measuring human rights respect. Hitherto, I have depended almost exclusively on Fariss’s Human Rights (HR) Scores, but he has not updated his dataset since 2020. In my previous final project, I identified a “raw” form of the physical violence index, derived from a simple average of the freedoms from political killings and torture indicators, as perhaps the best available substitute for HR Scores. However, for this project, I would like to try my hand at predicting the missing data in HR Scores—namely, all country-year observations 2021-2023, the most recent full years since 2020—with the raw physical violence index as an included covariate, <em>inter alia</em>.</p>
 </section>
 <section id="data-quality-complexity-check" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="data-quality-complexity-check">Data quality &amp; complexity check</h2>
@@ -3144,12 +3144,24 @@ Warning
 </section>
 <section id="target-variable-analysis-potential-data-issues" class="level2">
 <h2 class="anchored" data-anchor-id="target-variable-analysis-potential-data-issues">Target variable analysis &amp; potential data issues</h2>
-<p>HR Scores features no missing values from 1946 to 2020 and is, by construction, set to a normalized scale. Hence, there is scant cause for concern with respect to the target variable.</p>
+<p>HR Scores features no missing values from 1946 to 2020 and is, by construction, set to a normalized scale. Hence, in my estimation, there is scant cause for concern with respect to the target variable.</p>
 </section>
 <section id="misc" class="level2">
 <h2 class="anchored" data-anchor-id="misc">Misc</h2>
+<p>The main hurdles I anticipate encountering are the following:</p>
 <ul>
-<li>What imputation methods?</li>
+<li>What/how many covariates?
+<ul>
+<li>Ideally, I would be able to use as many covariates as possible to predict more recent values of HR Scores as precisely as possible. However, this might not be computationally possible sans the use of a high-performing computer (e.g., Northwestern’s Quest) given the sheer size of the dataset. Relatedly…</li>
+</ul></li>
+<li>What imputation methods?
+<ul>
+<li>As discussed previously, there is a substantial degree of missingness in the V-Dem dataset. There exist many methods to impute such data—multiple imputation included—but only some seem to be compatible with <code>tidymodels</code>. (Multiple imputation is not one of these.) Which method(s) is/are ideal given the problem, dataset, level of accuracy, computational limitations, etc.?</li>
+</ul></li>
+<li>Time series?
+<ul>
+<li>Given that this project endeavors to predict values across years, what time-series elements must I account for, and how should I do so?</li>
+</ul></li>
 </ul>
 </section>
 

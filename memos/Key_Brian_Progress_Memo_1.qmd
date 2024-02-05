@@ -86,11 +86,11 @@ HR Scores features no missing values from 1946 to 2020 and is, by construction, 
 
 ## Misc
 
-The main hurdles I anticipate bumping into are the following:
+The main hurdles I anticipate encountering are the following:
 
--   What/how many covariates?
-  -   Ideally, I would be able to use as many covariates as possible to predict more recent values of HR Scores as precisely as possible. However, this might not be computationally possible sans the use of a high-performing computer (e.g., Northwestern's Quest).
--   What imputation methods?
-  -   As discussed previously, there is a substantial degree of missingness in the V-Dem dataset. There exist many methods to impute such data---multiple imputation included---but only some seem to be compatible with `tidymodels`. (Multiple imputation is not one of these.)
--   Time series?
-  -   
+- What/how many covariates?
+  - Ideally, I would be able to use as many covariates as possible to predict more recent values of HR Scores as precisely as possible. However, this might not be computationally possible sans the use of a high-performing computer (e.g., Northwestern's Quest) given the sheer size of the dataset. Relatedly...
+- What imputation methods?
+  - As discussed previously, there is a substantial degree of missingness in the V-Dem dataset. There exist many methods to impute such data---multiple imputation included---but only some seem to be compatible with `tidymodels`. (Multiple imputation is not one of these.) Which method(s) is/are ideal given the problem, dataset, level of accuracy, computational limitations, etc.?
+- Time series?
+  - Given that this project endeavors to predict values across years, what time-series elements must I account for, and how should I do so?
