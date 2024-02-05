@@ -3046,9 +3046,9 @@ vertical-align: -.125em;
    
   <ul>
   <li><a href="#data-source" id="toc-data-source" class="nav-link active" data-scroll-target="#data-source">Data source</a></li>
-  <li><a href="#why-this-data" id="toc-why-this-data" class="nav-link" data-scroll-target="#why-this-data">Why this data</a></li>
+  <li><a href="#why-this-data-prediction-problem" id="toc-why-this-data-prediction-problem" class="nav-link" data-scroll-target="#why-this-data-prediction-problem">Why this data &amp; prediction problem</a></li>
   <li><a href="#data-quality-complexity-check" id="toc-data-quality-complexity-check" class="nav-link" data-scroll-target="#data-quality-complexity-check">Data quality &amp; complexity check</a></li>
-  <li><a href="#potential-data-issues" id="toc-potential-data-issues" class="nav-link" data-scroll-target="#potential-data-issues">Potential data issues</a></li>
+  <li><a href="#target-variable-analysis-potential-data-issues" id="toc-target-variable-analysis-potential-data-issues" class="nav-link" data-scroll-target="#target-variable-analysis-potential-data-issues">Target variable analysis &amp; potential data issues</a></li>
   <li><a href="#misc" id="toc-misc" class="nav-link" data-scroll-target="#misc">Misc</a></li>
   </ul>
 </nav>
@@ -3101,25 +3101,56 @@ Github Repo Link
 <p><a href="https://github.com/stat301-2-2024-winter/final-project-2-bkey15">Final Project Github Repo (BDK)</a></p>
 </div>
 </div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>My proposed project is meant to be a continuation of my final project from the previous quarter. As such, much (though not all) of what is contained herein is redundant, having appeared in some form or another in my previous submitted materials.</p>
+</div>
+</div>
 <section id="data-source" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="data-source">Data source</h2>
-<p>Blah blah blah<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup> an example of footnote — <a href="https://quarto.org/docs/blog/posts/2022-02-17-advanced-layout/">content in margins</a></p></li></div></section>
-<section id="why-this-data" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="why-this-data">Why this data</h2>
-<p>Blah blah blah<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
-<div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup> another footnote</p></li></div></section>
-<section id="data-quality-complexity-check" class="level2">
-<h2 class="anchored" data-anchor-id="data-quality-complexity-check">Data quality &amp; complexity check</h2>
-<p>Blah blah blah</p>
+<p>As before, I will be merging and analyzing two datasets: <a href="https://v-dem.net/">Varieties of Democracy</a> (University of Gothenburg) and <a href="https://dataverse.harvard.edu/dataverse/HumanRightsScores">Human Rights Scores</a> (Christopher Fariss, University of Michigan). The former is readily accessible as the R package <code>vdemdata</code>,<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> whereas the latter can be found on Fariss’s Dataverse page.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> The two datasets are in a country-year panel format and can be easily merged on the basis of year and country codes.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup> See the V-Dem Institute’s <a href="https://github.com/vdeminstitute/vdemdata">Github repo</a> for installation instructions.</p></li><li id="fn2"><p><sup>2</sup> See the link in the foregoing sentence.</p></li><li id="fn3"><p><sup>3</sup> The country codes, specifically, are <a href="https://correlatesofwar.org/">Correlates of War (COW)</a> IDs.</p></li></div></section>
+<section id="why-this-data-prediction-problem" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-data-prediction-problem">Why this data &amp; prediction problem</h2>
+<p>In brief, much of my dissertation relies on the use of a dependent variable measuring human rights respect. Hitherto, I have depended almost exclusively on Fariss’s Human Rights (HR) Scores, but he has not updated his dataset since 2020. In my previous final project, I identified a “raw” form of the physical violence index, derived from a simple average of the freedoms from political killings and torture indicators, as perhaps the best available substitute for HR Scores. However, for this project, I would like to try my hand at predicting the missing data in HR Scores—namely, all country-year observations 2021-2023, the most recent full years since 2020—with the raw physical violence index as an included covariate.</p>
 </section>
-<section id="potential-data-issues" class="level2">
-<h2 class="anchored" data-anchor-id="potential-data-issues">Potential data issues</h2>
-<p>Blah blah blah</p>
+<section id="data-quality-complexity-check" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="data-quality-complexity-check">Data quality &amp; complexity check</h2>
+<p>As aforementioned, the datasets are easy to access, load, and ultimately merge. Below is a very small cross section of columns and observations from the merged dataset,<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> evidence demonstrating that I have completed this task:</p>
+<div class="no-row-height column-margin column-container"><li id="fn4"><p><sup>4</sup> I have not provided a proper <code>glimpse()</code> because the dataset is too large to neatly do so.</p></li></div><div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   COWcode year country_name v2x_polyarchy    hr_score
+1       70 1946       Mexico         0.195 -0.01005120
+2       70 1947       Mexico         0.196 -0.01476311
+3       70 1948       Mexico         0.196 -0.02665304
+4       70 1949       Mexico         0.197 -0.04052474
+5       70 1950       Mexico         0.198 -0.04760842
+6       70 1951       Mexico         0.198 -0.05294322
+7       70 1952       Mexico         0.197 -0.06828818
+8       70 1953       Mexico         0.198 -0.06475775
+9       70 1954       Mexico         0.232 -0.06410060
+10      70 1955       Mexico         0.233 -0.07577272</code></pre>
+</div>
+</div>
+<p>The merged dataset is exceedingly large and complex, with 4603 variables (4573 numeric vs. 30 categorical) and 28353 observations. This does not mean, however, that I cannot circumscribe the universe of observations from which my predictions will be informed. In particular, because my research deals exclusively with developments post-World War II—namely, preferential trade agreements, bilateral investment treaties, and social media use by governments—and because HR Scores itself does not begin until said era, I can safely dismiss all prewar observations, reducing the number of rows to 13520.</p>
+</section>
+<section id="target-variable-analysis-potential-data-issues" class="level2">
+<h2 class="anchored" data-anchor-id="target-variable-analysis-potential-data-issues">Target variable analysis &amp; potential data issues</h2>
+<p>HR Scores features no missing values from 1946 to 2020 and is, by construction, set to a normalized scale. Hence, there is scant cause for concern with respect to the target variable.</p>
 </section>
 <section id="misc" class="level2">
 <h2 class="anchored" data-anchor-id="misc">Misc</h2>
-<p>Blah Blah</p>
+<ul>
+<li>What imputation methods?</li>
+</ul>
 </section>
 
 

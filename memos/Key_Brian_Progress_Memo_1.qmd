@@ -22,28 +22,75 @@ reference-location: margin
 citation-location: margin
 ---
 
+```{r, echo = FALSE}
+#| label: load-pkgs
+#| code-fold: false
+
+library(tidyverse)
+library(vdemdata)
+library(naniar)
+
+vdem <- vdem
+
+setwd("/Users/briankey/Documents/Academics/Northwestern/Y5Q1/Stat-301-1/Final Project/final-project-1-bkey15")
+hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
+```
+
 ::: {.callout-tip icon=false}
+
 ## Github Repo Link
 
 [Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
+
+:::
+
+::: {.callout-warning}
+
+My proposed project is meant to be a continuation of my final project from the previous quarter. As such, much (though not all) of what is contained herein is redundant, having appeared in some form or another in my previous submitted materials.
+
 :::
 
 ## Data source
 
-Blah blah blah^[an example of footnote --- [content in margins](https://quarto.org/docs/blog/posts/2022-02-17-advanced-layout/)]
+As before, I will be merging and analyzing two datasets: [Varieties of Democracy](https://v-dem.net/) (University of Gothenburg) and [Human Rights Scores](https://dataverse.harvard.edu/dataverse/HumanRightsScores) (Christopher Fariss, University of Michigan). The former is readily accessible as the R package `vdemdata`,^[See the V-Dem Institute's [Github repo](https://github.com/vdeminstitute/vdemdata) for installation instructions.] whereas the latter can be found on Fariss's Dataverse page.^[See the link in the foregoing sentence.] The two datasets are in a country-year panel format and can be easily merged on the basis of year and country codes.^[The country codes, specifically, are [Correlates of War (COW)](https://correlatesofwar.org/) IDs.]
 
-## Why this data
+## Why this data & prediction problem
 
-Blah blah blah^[another footnote]
+In brief, much of my dissertation relies on the use of a dependent variable measuring human rights respect. Hitherto, I have depended almost exclusively on Fariss's Human Rights (HR) Scores, but he has not updated his dataset since 2020. In my previous final project, I identified a "raw" form of the physical violence index, derived from a simple average of the freedoms from political killings and torture indicators, as perhaps the best available substitute for HR Scores. However, for this project, I would like to try my hand at predicting the missing data in HR Scores---namely, all country-year observations 2021-2023, the most recent full years since 2020---with the raw physical violence index as an included covariate, *inter alia*.
 
 ## Data quality & complexity check
 
-Blah blah blah
+As aforementioned, the datasets are easy to access, load, and ultimately merge. Below is a very small cross section of columns and observations from the merged dataset,^[I have not provided a proper `glimpse()` because the dataset is too large to neatly do so.] evidence demonstrating that I have completed this task:
 
-## Potential data issues
+```{r}
+hr_scores_small <- hr_scores |> 
+  select(YEAR, COW, theta_mean) |> 
+  rename(year = YEAR, COWcode = COW, hr_score = theta_mean)
 
-Blah blah blah
+full_data <- full_join(vdem, hr_scores_small) |> 
+  relocate(COWcode, year, hr_score)
+
+full_data_postwar <- full_data |> 
+  filter(year > 1945)
+
+full_data_postwar |> 
+  select(COWcode, year, country_name, v2x_polyarchy, hr_score) |> 
+  filter(COWcode == 70 & year < 1956)
+```
+
+The merged dataset is exceedingly large and complex, with `r ncol(full_data)` variables (`r sapply(full_data, is.numeric) |> sum()` numeric vs. `r ncol(full_data) - sapply(full_data, is.numeric) |> sum()` categorical) and `r nrow(full_data)` observations. This does not mean, however, that I cannot circumscribe the universe of observations from which my predictions will be informed. In particular, because my research deals exclusively with developments post-World War II---namely, preferential trade agreements, bilateral investment treaties, and social media use by governments---and because HR Scores itself does not begin until said era, I can safely dismiss all prewar observations, reducing the number of rows to `r nrow(full_data_postwar)`.
+
+## Target variable analysis & potential data issues
+
+HR Scores features no missing values from 1946 to 2020 and is, by construction, set to a normalized scale. Hence, in my estimation, there is scant cause for concern with respect to the target variable.
 
 ## Misc
 
-Blah Blah
+The main hurdles I anticipate bumping into are the following:
+
+-   What/how many covariates?
+  -   Ideally, I would be able to use as many covariates as possible to predict more recent values of HR Scores as precisely as possible. However, this might not be computationally possible sans the use of a high-performing computer (e.g., Northwestern's Quest).
+-   What imputation methods?
+  -   As discussed previously, there is a substantial degree of missingness in the V-Dem dataset. There exist many methods to impute such data---multiple imputation included---but only some seem to be compatible with `tidymodels`. (Multiple imputation is not one of these.)
+-   Time series?
+  -   
