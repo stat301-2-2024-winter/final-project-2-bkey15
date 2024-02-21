@@ -23,6 +23,8 @@ vdem <- vdem
 hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 cow_codes <- read_csv("data/raw/COW-country-codes.csv")
 
+# merge data ----
+## prep hr_scores for merge ----
 hr_scores <- hr_scores |> 
   select(
     YEAR, COW, theta_mean
@@ -33,11 +35,8 @@ hr_scores <- hr_scores |>
     hr_score = theta_mean
   )
 
-# merge data ----
-
-full_data_original <- full_join(vdem, hr_scores)
-
-full_data <- full_join(vdem, hr_scores) |> 
+## complete merge ----
+merge_data <- full_join(vdem, hr_scores) |> 
   mutate(
     cow_year = paste(
       COWcode, year, sep = "-"
@@ -48,9 +47,43 @@ full_data <- full_join(vdem, hr_scores) |>
   ) |> 
   filter(year > 1945)
 
+## save merge ----
+merge_data |> 
+  save(
+    file = here("data/preproc/merge_data.rda")
+    )
+
+## BDK: skip this for now
 cow_codes <- cow_codes |> 
   select(-StateAbb) |> 
   rename(
     COWcode = CCode,
     country_name = StateNme
   )
+
+# viz. hr_scores
+merge_data |> 
+  ggplot(
+    aes(
+      x = hr_score
+    )
+  ) +
+  geom_density() +
+  labs(
+    x = "HR Score",
+    y = "Density",
+    title = "Density Plot: Human Rights Scores",
+    subtitle = "The distribution is relatively symmetrical"
+  ) +
+  theme_bw()
+
+merge_data |> 
+  ggplot(
+    aes(
+      x = hr_score
+    )
+  ) +
+  geom_boxplot() +
+  theme_bw()
+
+# split data ----
