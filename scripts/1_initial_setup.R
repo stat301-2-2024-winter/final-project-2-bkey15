@@ -50,7 +50,7 @@ merge_data <- full_join(vdem, hr_scores) |>
 ## save merge ----
 merge_data |> 
   save(
-    file = here("data/preproc/merge_data.rda")
+    file = here("data/preprocessed/merge_data.rda")
     )
 
 ## BDK: skip this for now
@@ -87,3 +87,39 @@ merge_data |>
   theme_bw()
 
 # split data ----
+## set seed ----
+set.seed(2612)
+
+## complete split ----
+merge_split <- merge_data |> 
+  initial_split(
+    prop = 0.75,
+    strata = hr_score
+  )
+
+merge_train <- training(merge_split)
+merge_test <- testing(merge_split)
+
+## fold training data ----
+merge_train_folds <- merge_train |> 
+  vfold_cv(
+    v = 10,
+    repeats = 5,
+    strata = hr_score
+  )
+
+## save splits & folds ----
+merge_train |> 
+  save(
+    file = here("data/data_splits/merge_train.rda")
+    )
+
+merge_test |> 
+  save(
+    file = here("data/data_splits/merge_test.rda")
+    )
+
+merge_train_folds |> 
+  save(
+    file = here("data/data_splits/merge_train_folds.rda")
+    )
