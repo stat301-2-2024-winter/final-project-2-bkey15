@@ -1,0 +1,23 @@
+## 02/21/24 ##
+
+- I think I can merge tidymodels fits with mice package, specifically as.mira()? See https://amices.org/mice/reference/as.mira.html
+
+- Description of process:
+  1. PREDICT hr_score through a standard tidymodeling process. This will include the use of step_impute_bag to impute predictors.
+  2. SUBSTITUTE missing values in hr_score with predictions, assuming model is found to be robust.
+  3. FIT a model (with hr_score as outcome, now that it's complete) using the tidymodeling process, again imputing predictors with step_impute_bag.
+  4. REPEAT to create a series of fits (perhaps m=5) suitable for the mice package.
+  5. TRANSFORM fits with as.mira so that they're ready to...
+  6. POOL, yielding the final inference.
+  
+- **Step 1 is what this project endeavors to complete.**
+- Step 3 will need the use v-fold cross-validation to locate the optimal tuning parameters, given that I'll be relying on a lasso regression at this point.
+- I'm having issues with proof of concept for Step 5, but I'm assuming it'll be doable.
+- Another way to begin step 3 is to convert imputed datasets (created tidymodeling preprocessing, ending specifically with prep + bake) into mids objects using as.mids, and then running the fit using: with(mids_obj, formula). Formula would need to use glmnet for lasso. Does look hard to convert objects into mids_obj, though...
+- The main question I'm thinking through is: should I merge 5-ish fits, or 5-ish imputed datasets, either of which could fully rely on tidymodeling?
+- Or I could just do the whole thing beginning with Step 3 using mice. Might be easier, might not be...
+
+## 02/22/24 ##
+
+- For this project, I should run two predictions: one for avg_kill_tort as the sole predictor, and the other using a bigger (but not too big) set of variables.
+- I tried imputing all missing values in the dataset last night to no avail (R aborted task due to max-out of memory).
