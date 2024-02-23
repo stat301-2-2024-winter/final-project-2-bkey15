@@ -1,0 +1,436 @@
+--------------------------------------------------------------------------------
+PTS-2022 - Release: 2023-09-22 
+--------------------------------------------------------------------------------
++ added PTS_A, PTS_H, and PTS_S scores for 2022
++ new unit Russian Occupied Territory in Ukraine
++ updated codebook (Version 2.10)
+
+--------------------------------------------------------------------------------
+PTS-2021 - Release: 2022-08-25 
+--------------------------------------------------------------------------------
++ added PTS_A, PTS_H, and PTS_S scores for 2021
++ updated codebook (Version 2.00)
+
+--------------------------------------------------------------------------------
+PTS-2020 - Release: 2021-10-15 
+--------------------------------------------------------------------------------
++ added PTS_A, PTS_H, and PTS_S scores for 2020
++ updated codebook (Version 1.40)
++ added back-coded scores for previously uncoded U.S. State Department reports
+	- Andorra 1993
+	- Andorra 1998
+	- Andorra 2007
+	- Andorra 2008
+	- Andorra 2009
+	- Andorra 2010
+	- Andorra 2011
+	- Andorra 2013
+	- Antigua and Barbuda 2003
+	- Antigua and Barbuda 2007
+	- Antigua and Barbuda 2013
+	- Belize 1982
+	- Belize 1984
+	- Belize 1987
+	- Bhutan 1979
+	- Central African Republic 1984
+	- Central African Republic 1986
+	- Dominica 1980
+	- Dominica 1981
+	- Dominica 1984
+	- Dominica 1985
+	- Dominica 1986
+	- Dominica 1990
+	- Dominica 1993
+	- Dominica 1994
+	- Dominica 1998
+	- Dominica 2004
+	- Dominica 2006
+	- Dominica 2007
+	- Equatorial Guinea 1980
+	- Germany 1996
+	- Guinea-Bissau 1980
+	- Guinea-Bissau 1984
+	- Kiribati 2001
+	- Kiribati 2002
+	- Kiribati 2003
+	- Kiribati 2005
+	- Kiribati 2007
+	- Kiribati 2008
+	- Kiribati 2011
+	- Kuwait 1980
+	- Lebanon 1984
+	- Lebanon 1986
+	- Lebanon 1988
+	- Liechtenstein 2000
+	- Liechtenstein 2005
+	- Liechtenstein 2007
+	- Liechtenstein 2011
+	- Liechtenstein 2013
+	- Marshall Islands 1999
+	- Marshall Islands 2000
+	- Marshall Islands 2001
+	- Marshall Islands 2004
+	- Marshall Islands 2011
+	- Marshall Islands 2012
+	- Micronesia, Federated States of 2000
+	- Micronesia, Federated States of 2003
+	- Micronesia, Federated States of 2005
+	- Micronesia, Federated States of 2006
+	- Micronesia, Federated States of 2012
+	- Micronesia, Federated States of 2013
+	- Monaco 1994
+	- Monaco 1998
+	- Monaco 2004
+	- Monaco 2007
+	- Monaco 2008
+	- Monaco 2011
+	- Nauru 1999
+	- Nauru 2000
+	- Nauru 2003
+	- Nauru 2005
+	- Nauru 2006
+	- Nauru 2011
+	- Palau 1999
+	- Palau 2008
+	- Palau 2009
+	- Palau 2012
+	- Palau 2013
+	- Saint Kitts and Nevis 2003
+	- Saint Kitts and Nevis 2009
+	- Samoa 2005
+	- Samoa 2006
+	- San Marino 2003
+	- San Marino 2012
+	- Slovenia 1993
+	- Slovenia 1994
+	- Slovenia 1995
+	- Tonga 1999
+	- Tonga 2001
+	- Tonga 2002
+	- Tonga 2004
+	- Tonga 2006
+	- Tonga 2007
+	- Tonga 2008
+	- Tuvalu 1994
+	- Tuvalu 1996
+	- Tuvalu 2001
+	- Tuvalu 2006
+	- Tuvalu 2011
+	- Western Sahara 1996
+	- Western Sahara 1997
+	- Western Sahara 1998
+	- Western Sahara 2000
+	- Western Sahara 2003
+	- Western Sahara 2004
+	- Western Sahara 2006
+	- Western Sahara 2008
+	- Western Sahara 2010
+
+--------------------------------------------------------------------------------
+PTS-2019 - Release: 2020-09-11 
+--------------------------------------------------------------------------------
++ added PTS_A, PTS_H, and PTS_S scores for 2019
++ added territory of Somaliland
++ updated NA_Status_A, NA_Status_H, and NA_Status_S indicator to reflect newly
+	added scores
++ updated codebook (Version 1.30)
++ added back-coded scores for previously uncoded U.S. State Department reports
+	- Albania 1979
+	- Andorra 1996
+	- Andorra 1997
+	- Andorra 2000
+	- Andorra 2001
+	- Andorra 2003
+	- Andorra 2005
+	- Andorra 2012
+	- Antigua and Barbuda 1999
+	- Antigua and Barbuda 2000
+	- Antigua and Barbuda 2001
+	- Antigua and Barbuda 2002
+	- Antigua and Barbuda 2004
+	- Antigua and Barbuda 2005
+	- Antigua and Barbuda 2008
+	- Antigua and Barbuda 2009
+	- Antigua and Barbuda 2010
+	- Antigua and Barbuda 2012
+	- Belize 1981
+	- Belize 1985
+	- Belize 1986
+	- Cabo Verde 2014
+	- Cambodia 1979
+	- Central African Republic 1980
+	- Central African Republic 1981
+	- Central African Republic 1982
+	- Central African Republic 1983
+	- Central African Republic 1985
+	- Chad 1983
+	- Cyprus 1978
+	- Dominica 1982
+	- Dominica 1983
+	- Dominica 1987
+	- Dominica 1988
+	- Dominica 1991
+	- Dominica 1995
+	- Dominica 1996
+	- Dominica 1997
+	- Dominica 1999
+	- Dominica 2000
+	- Dominica 2001
+	- Dominica 2002
+	- Dominica 2003
+	- Dominica 2005
+	- Dominica 2008
+	- Dominica 2009
+	- Dominica 2010
+	- Dominica 2011
+	- Equatorial Guinea 1979
+	- Equatorial Guinea 1984
+	- Equatorial Guinea 1992
+	- Fiji 1979
+	- Fiji 1988
+	- Fiji 1990
+	- Fiji 1992
+	- France 1996
+	- Guinea-Bissau 1992
+	- Japan 1996
+	- Kiribati 2000
+	- Kiribati 2006
+	- Kiribati 2009
+	- Kiribati 2010
+	- Kiribati 2012
+	- Kiribati 2013
+	- Korea, Democratic People's Republic of 1996
+	- Kuwait 1984
+	- Kuwait 1992
+	- Lebanon 1980
+	- Lebanon 1983
+	- Lebanon 1985
+	- Lebanon 1987
+	- Lebanon 1989
+	- Liechtenstein 1999
+	- Liechtenstein 2000
+	- Liechtenstein 2002
+	- Liechtenstein 2003
+	- Liechtenstein 2004
+	- Liechtenstein 2006
+	- Liechtenstein 2008
+	- Liechtenstein 2009
+	- Liechtenstein 2010
+	- Liechtenstein 2012
+	- Marshall Islands 2002
+	- Marshall Islands 2003
+	- Marshall Islands 2005
+	- Marshall Islands 2006
+	- Marshall Islands 2007
+	- Marshall Islands 2008
+	- Marshall Islands 2009
+	- Marshall Islands 2010
+	- Marshall Islands 2013
+	- Micronesia, Federated States of 2001
+	- Micronesia, Federated States of 2002
+	- Micronesia, Federated States of 2007
+	- Micronesia, Federated States of 2008
+	- Micronesia, Federated States of 2009
+	- Micronesia, Federated States of 2010
+	- Micronesia, Federated States of 2011
+	- Monaco 1993
+	- Monaco 1995
+	- Monaco 1996
+	- Monaco 1997
+	- Monaco 1999
+	- Monaco 2000
+	- Monaco 2001
+	- Monaco 2002
+	- Monaco 2004
+	- Monaco 2006
+	- Monaco 2009
+	- Monaco 2012
+	- Monaco 2013
+	- Mongolia 1979
+	- Mongolia 1981
+	- Mongolia 1982
+	- Mongolia 1984
+	- Mongolia 1985
+	- Mongolia 1986
+	- Mongolia 1987
+	- Montenegro 2007
+	- Namibia 1982
+	- Namibia 1983
+	- Nauru 2001
+	- Nauru 2002
+	- Nauru 2004
+	- Nauru 2007
+	- Nauru 2008
+	- Nauru 2009
+	- Nauru 2010
+	- Nauru 2012
+	- Nauru 2013
+	- Oman 1992
+	- Palau 2002
+	- Palau 2003
+	- Palau 2004
+	- Palau 2011
+	- Papua New Guinea 1980
+	- Papua New Guinea 1984
+	- Papua New Guinea 1992
+	- Rwanda 1980
+	- Rwanda 1984
+	- Rwanda 1992
+	- Saint Kitts and Nevis 1999
+	- Saint Kitts and Nevis 2000
+	- Saint Kitts and Nevis 2001
+	- Saint Kitts and Nevis 2002
+	- Saint Kitts and Nevis 2004
+	- Saint Kitts and Nevis 2005
+	- Saint Kitts and Nevis 2006
+	- Saint Kitts and Nevis 2007
+	- Saint Kitts and Nevis 2008
+	- Saint Kitts and Nevis 2010
+	- Saint Kitts and Nevis 2011
+	- Saint Kitts and Nevis 2013
+	- San Marino 1999
+	- San Marino 2000
+	- San Marino 2001
+	- San Marino 2002
+	- San Marino 2005
+	- San Marino 2006
+	- San Marino 2007
+	- San Marino 2008
+	- San Marino 2009
+	- San Marino 2011
+	- San Marino 2013
+	- Serbia 2006
+	- Slovenia 1992
+	- Slovenia 1996
+	- Taiwan, Province of China 2004
+	- Tonga 2000
+	- Tonga 2003
+	- Tonga 2009
+	- Tonga 2010
+	- Tonga 2011
+	- Tonga 2012
+	- Tonga 2013
+	- Tuvalu 1991
+	- Tuvalu 1992
+	- Tuvalu 1995
+	- Tuvalu 1997
+	- Tuvalu 1998
+	- Tuvalu 1999
+	- Tuvalu 2000
+	- Tuvalu 2002
+	- Tuvalu 2003
+	- Tuvalu 2004
+	- Tuvalu 2005
+	- Tuvalu 2007
+	- Tuvalu 2008
+	- Tuvalu 2009
+	- Tuvalu 2010
+	- Tuvalu 2012
+	- Tuvalu 2013
+	- Western Sahara 1999
+	- Western Sahara 2001
+	- Western Sahara 2002
+	- Western Sahara 2005
+	- Western Sahara 2007
+	- Western Sahara 2012
+	- Western Sahara 2013
+	- Yemen People's Republic 1989
+
+--------------------------------------------------------------------------------
+PTS-2018 - Release: 2019-08-08 
+--------------------------------------------------------------------------------
+
++ added PTS_H, and PTS_S scores for 2018
++ changed Country variable value Swaziland to Eswatini
++ changed Country variable value Macedonia to North Macedonia
++ added back-coded scores for previously uncoded U.S. State Department reports
+	- Andorra 1994
+	- Andorra 1995
+	- Andorra 1999
+	- Andorra 2002
+	- Andorra 2004
+	- Andorra 2006
+	- Antigua and Barbuda 2006
+	- Antigua and Barbuda 2011
+	- Belize 1983
+	- Bhutan 1980
+	- Bhutan 1981
+	- Bhutan 1987
+	- Chad 1981
+	- Cyprus 1992
+	- Cyprus 1993
+	- Dominica 1989
+	- Dominica 1992
+	- Dominica 2012
+	- Dominica 2013
+	- Fiji 1989
+	- Fiji 1991
+	- Iran 1978
+	- Kiribati 1999
+	- Kiribati 2004
+	- Lebanon 1981
+	- Lebanon 1982
+	- Liechtenstein 2001
+	- Malawi 1987
+	- Micronesia, Federated States of 2004
+	- Monaco 2003
+	- Monaco 2005
+	- Monaco 2010
+	- Mongolia 1989
+	- Mongolia 1990
+	- Montenegro 2006
+	- Namibia 1981
+	- Palau 2000
+	- Palau 2001
+	- Palau 2005
+	- Palau 2006
+	- Palau 2007
+	- Palau 2010
+	- St. Kitts and Nevis 2012
+	- San Marino 2004
+	- San Marino 2010
+	- Tonga 2005
+	- Tuvalu 1993
+	- Western Sahara 2009
+	- Western Sahara 2011
++ added PTS_A scores for 2018 based on Amnesty International's regional report: 
+	'HUMAN RIGHTS IN THE MIDDLE EAST AND NORTH AFRICA: REVIEW OF 2018' in lieu 
+	of the annual 'AMNESTY INTERNATIONAL REPORT: THE STATE OF THE WORLD'S HUMAN
+	RIGHTS' which was not published this year  
++ updated NA_Status_S indicator to reflect newly added scores
++ updated codebook (Version 1.20)
+
+--------------------------------------------------------------------------------
+PTS-2018 - Release: 2018-12-06 
+--------------------------------------------------------------------------------
+
++ added PTS_A, PTS_H, and PTS_S scores for 2017
++ changed the PTS_S score for Mexico for the year 2016 from 2 to 4
++ updated codebook (Version 1.10)
+
+--------------------------------------------------------------------------------
+PTS-2017 - Release: 2017-10-11 
+--------------------------------------------------------------------------------
+
++ added PTS_A, PTS_H, and PTS_S scores for 2016
++ added variable NA_Status_A, NA_Status_H, and NA_Status_S to characterize NAs
++ added PTS-Codebook (Version 1.00)
+
+--------------------------------------------------------------------------------
+PTS-2016 - Release: 2016-09-09 
+--------------------------------------------------------------------------------
+
++ renamed variables PTS-a, PTS-h, and PTS-s to PTS_A, PTS_H, and PTS_S
++ added PTS_A, PTS_H, and PTS_S scores for 2015
++ added a new Country variable (changing country names to official names)
++ renamed old Country variable to Country_OLD
++ added entries for observations with missing reports and/or scores
++ revised, updated, and added identifiers and country codes:
+	COW_Code_A
+	COW_Code_N
+	WorldBank_Code_A
+	UN_Code_N
+	Region
++ removed old identifiers and country codes
++ transitioned to the report-year format for the Excel release
++ added data archive

@@ -20,34 +20,34 @@ tidymodels_prefer()
 
 # split data ----
 ## load merge_data ----
-load(here("data/preprocessed/merge_data.rda"))
+load(here("data/preprocessed/preproc_data.rda"))
 
 ## set seed ----
 set.seed(2612)
 
 ## complete split ----
-merge_split <- merge_data |> 
+split <- preproc_data |> 
   initial_split(
     prop = 0.75,
     strata = hr_score
   )
 
-merge_train <- training(merge_split)
-merge_test <- testing(merge_split)
+train <- training(split)
+test <- testing(split)
 
 ## save splits ----
-merge_train |> 
+train |> 
   save(
-    file = here("data/data_splits/merge_train.rda")
+    file = here("data/data_splits/train.rda")
   )
-merge_test |> 
+test |> 
   save(
-    file = here("data/data_splits/merge_test.rda")
+    file = here("data/data_splits/test.rda")
   )
 
 # fold training data ----
 ## load training data ----
-load(here("data/data_splits/merge_train.rda"))
+load(here("data/data_splits/train.rda"))
 
 ## register cores ----
 registerDoMC(cores = 8)
@@ -56,7 +56,7 @@ registerDoMC(cores = 8)
 set.seed(2612)
 
 ## fold training data ----
-merge_train_folds <- merge_train |> 
+train_folds <- train |> 
   vfold_cv(
     v = 10,
     repeats = 5,
@@ -64,7 +64,7 @@ merge_train_folds <- merge_train |>
   )
 
 ## save folds ----
-merge_train_folds |> 
+train_folds |> 
   save(
-    file = here("data/data_splits/merge_train_folds.rda")
+    file = here("data/data_splits/train_folds.rda")
   )

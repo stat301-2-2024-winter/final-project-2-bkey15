@@ -21,3 +21,18 @@
 
 - For this project, I should run two predictions: one for avg_kill_tort as the sole predictor, and the other using a bigger (but not too big) set of variables.
 - I tried imputing all missing values in the dataset last night to no avail (R aborted task due to max-out of memory).
+- I've tried merging PTS & QoG (which has PTS) with preproc_data, but it's not completing correctly due to missingness in cowcode.
+- Only observations with a cowcode has a corresponding hr_score. That is, there is no hr_score for any observation that lacks a cowcode.
+- These are the cases lacking a cowcode + hr_score in preproc_data:
+  - Palestine/West Bank
+  - Palestine/Gaza
+  - Somaliland
+  - Hong Kong
+  - Palestine/British Mandate
+  - Zanzibar
+- Pretty similar set of cases (cow_year duplicates) in pts.
+- This is an extremely limited number of cases that probably don't matter for the issue of trade agreements. Going to filter these out to get a consistent merge.
+- I suppose I could create a step_dummy using country_name_vdem rather than cowcode?
+- This actually wouldn't work since there's no data at all to fit and test performance. What could potentially work is estimating by introducing a step_dummy for region rather than country. Maybe return to this, especially if dummy by country is too computationally difficult.
+- Also, step_dummy for time (year) isn't going to work either. Computing the estimated relationship between 2015, 2016, etc. and the outcome doesn't give us any information as to what the relationship will be in 2020, 2021, etc. So, let's leave out the time component. Also, it can be argued from a theoretical standpoint that the relationship between political killings, etc. and human rights performance is unaffected by time considerations (i.e., if a government kills, then it's ipso facto performing poorly HR-wise, irrespective of the time point).
+

@@ -17,14 +17,11 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load data ----
-load(here("data/preprocessed/merge_data.rda"))
-
-# missingness hr_scores ----
-
+load(here("data/preprocessed/preproc_data.rda"))
 
 # viz. hr_scores ----
 ## density plot ----
-outcome_dens_plot <- merge_data |> 
+outcome_dens_plot <- preproc_data |> 
   ggplot(
     aes(
       x = hr_score
@@ -38,7 +35,7 @@ outcome_dens_plot <- merge_data |>
   theme_solarized()
 
 ## boxplot ----
-outcome_boxplot <- merge_data |> 
+outcome_boxplot <- preproc_data |> 
   ggplot(
     aes(
       x = hr_score
@@ -52,10 +49,18 @@ outcome_boxplot <- merge_data |>
   theme_solarized()
 
 ## combine ----
-outcome_dens_plot / outcome_boxplot + plot_annotation(
+hr_score_dist_plots <- outcome_dens_plot / outcome_boxplot + plot_annotation(
   title = "Visualizing the Distribution of Human Rights Scores",
     subtitle = "Density Plot (Top) & Boxplot (Bottom)",
-    caption = "Source: HR Scores (2020)",
+    caption = "Source: HR Scores (Fariss, 2020)",
     theme = theme_solarized()
   )
+
+ggsave(
+  hr_score_dist_plots,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/hr_score_dist_plots.png")
+)
 
