@@ -64,3 +64,11 @@ ggsave(
   file = here("plots/hr_score_dist_plots.png")
 )
 
+preproc_data |> 
+  ggplot(
+    aes(
+      x = log10(e_gdppc)
+    )
+  ) +
+  geom_density()
+

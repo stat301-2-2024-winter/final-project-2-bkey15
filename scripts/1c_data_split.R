@@ -1,7 +1,7 @@
 # Final Project ----
 # Initial data split
 
-# Random process in script, seed set right before it
+# Random process in script; seed set right before it
 
 # load packages ----
 library(tidyverse)
@@ -38,16 +38,16 @@ test <- testing(split)
 ## save splits ----
 train |> 
   save(
-    file = here("data/data_splits/train.rda")
+    file = here("data/splits/train.rda")
   )
 test |> 
   save(
-    file = here("data/data_splits/test.rda")
+    file = here("data/splits/test.rda")
   )
 
 # fold training data ----
 ## load training data ----
-load(here("data/data_splits/train.rda"))
+load(here("data/splits/train.rda"))
 
 ## register cores ----
 registerDoMC(cores = 8)
@@ -66,5 +66,5 @@ train_folds <- train |>
 ## save folds ----
 train_folds |> 
   save(
-    file = here("data/data_splits/train_folds.rda")
+    file = here("data/splits/train_folds.rda")
   )
