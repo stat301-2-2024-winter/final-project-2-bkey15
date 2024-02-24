@@ -27,8 +27,19 @@ hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 ## pts ----
 load(here("data/raw/PTS-2023.RData"))
 
+## cow_codes ----
+## BDK: this is more for reference
+cow_codes <- read_csv("data/raw/COW-country-codes.csv")
+
 # merge data ----
 ## prep merge
+### vdem ----
+### BDK: it's essential to recode Czechia's cow_code early on, as it's much more complicated to rectify the missingness that would arise in this instance later on in the process
+vdem <- vdem |> 
+  mutate(
+    COWcode = if_else(COWcode == 315, 316, COWcode)
+  )
+
 ### hr_scores ----
 hr_scores <- hr_scores |> 
   select(YEAR, COW, theta_mean) |>
@@ -53,7 +64,21 @@ pts <- PTS_2023 |>
       cowcode, year, sep = "-"
       )
     ) |> 
-  filter(!duplicated(cow_year))
+  filter(
+    !duplicated(cow_year)
+    )
+
+### cow_codes ----
+### BDK: we're including and merging this b/c v-dem is missing a lot of country names
+cow_codes <- cow_codes |> 
+  select(-StateAbb) |> 
+  rename(
+    cowcode = CCode,
+    country_name_cow = StateNme
+  ) |> 
+  filter(
+    !duplicated(cowcode)
+  )
 
 ## complete merge ----
 ### vdem & hr_scores ----
@@ -72,10 +97,19 @@ preproc_data <- right_join(vdem, hr_scores) |>
 
 ### BDK: check for duplicates - shouldn't have any (i.e., should get an empty set)
 duplicate_test <- preproc_data |> 
-  filter(duplicated(cow_year))
+  filter(
+    duplicated(cow_year)
+    )
 
 ### merge preproc & pts ----
 preproc_data <- left_join(preproc_data, pts)
+
+### merge preproc & cow_codes ----
+preproc_data <- left_join(preproc_data, cow_codes) |> 
+  relocate(
+    country_name_cow,
+    .after = country_name
+    )
 
 ## create avg_kill_tort ----
 preproc_data <- preproc_data |> 
@@ -88,11 +122,13 @@ preproc_data <- preproc_data |>
     )
 
 ## select needed vars only ----
+## BDK: a quick check shows no missingness in country_name_cow; so include this rather than v-dem's country_name
 preproc_data <- preproc_data |> 
   select(
     cowcode,
     year,
     cow_year,
+    country_name_cow,
     hr_score,
     avg_kill_tort,
     v2x_clphy,
@@ -141,20 +177,44 @@ preproc_data <- preproc_data |>
     PTS_A,
     PTS_H,
     PTS_S
+    ) |> 
+  rename(
+    country_name = country_name_cow
     )
 
-## save merge ----
+# initial missingness check ----
+gg_miss_var(preproc_data)
+
+## BDK: we have missingness in a lot of the v-dem vars. Let's check where avg_kill_tort is missing:
+preproc_data |> 
+  select(cowcode, country_name, avg_kill_tort) |> 
+  summarize(
+    n_miss = n_miss(avg_kill_tort),
+    .by = c(cowcode, country_name)
+    ) |> 
+  arrange(
+    desc(n_miss)
+    ) |> 
+  datatable(
+    colnames = c(
+      "COW Code", "Country Name", "N Missing"
+    ),
+    style = "bootstrap4"
+    )
+
+## BDK: microstates + post-Soviet/WWII states. The microstates basically have no data whatsoever, so we may need to remove them entirely. We can also remove missing rows for the latter; see notes, but these generally result from coding gaps, coding start dates, etc.
+
+# remove missing rows ----
+preproc_data <- preproc_data |> 
+  filter(
+    !is.na(avg_kill_tort)
+    )
+
+# final missingness check ----
+gg_miss_var(preproc_data)
+
+# save preproc_data ----
 preproc_data |> 
   save(
     file = here("data/preprocessed/preproc_data.rda")
     )
-
-## BDK: skip this for now
-
-## prep cow_codes for merge
-cow_codes <- cow_codes |> 
-  select(-StateAbb) |> 
-  rename(
-    cowcode = CCode,
-    country_name_cow = StateNme
-  )

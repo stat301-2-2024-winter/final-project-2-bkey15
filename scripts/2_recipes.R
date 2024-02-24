@@ -1,6 +1,8 @@
 # Final Project ----
 # Recipe creation
 
+# Seed set and used for recipe check (imputation w/ bagged trees)
+
 # load packages ----
 library(tidyverse)
 library(tidymodels)
@@ -19,11 +21,7 @@ tidymodels_prefer()
 # load training set
 load(here("data/splits/train.rda"))
 
-# create baseline recipes ----
-## null ----
-
-## basic ----
-
+# create recipes ----
 ## avg_kill_tort only ----
 akt_rec <- train |> 
   recipe(hr_score ~ avg_kill_tort + cow_year) |> 
@@ -42,24 +40,36 @@ akt_rec |>
     file = here("data/recipes/akt_rec.rda")
     )
 
-# create recipe ----
-main_recipe <- train |> 
+## basic rec ----
+basic_rec <- train |> 
   recipe(hr_score ~ .) |> 
+  step_rm(country_name, year, PTS_A, PTS_H, PTS_S) |> 
+  update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
-    COWcode = factor(COWcode),
-    year = factor(year)
+    cowcode = factor(cowcode),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
     ) |> 
-  step_dummy(COWcode, year) |> 
-  step_rm(1:21) |> 
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(all_nominal_predictors()) |> 
   step_zv(all_predictors()) |> 
-  step_normalize(all_numeric_predictors()) |>
+  step_normalize(all_numeric_predictors()) |> 
   step_impute_bag(all_predictors())
-  
-# check recipe ----
-rec_check <- main_recipe |> 
+
+### rec check ----
+#### set seed ----
+set.seed(2612)
+
+#### complete check ----
+rec_check <- basic_rec |> 
   prep() |> 
   bake(new_data = NULL)
 
+### write rec ----
+basic_rec |> 
+  save(
+    file = here("data/recipes/basic_rec.rda")
+  )
 
-merge_data |> 
-  specify(hr_score ~ v2x_polyarchy)
+

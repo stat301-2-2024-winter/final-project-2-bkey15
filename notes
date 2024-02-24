@@ -36,3 +36,9 @@
 - This actually wouldn't work since there's no data at all to fit and test performance. What could potentially work is estimating by introducing a step_dummy for region rather than country. Maybe return to this, especially if dummy by country is too computationally difficult.
 - Also, step_dummy for time (year) isn't going to work either. Computing the estimated relationship between 2015, 2016, etc. and the outcome doesn't give us any information as to what the relationship will be in 2020, 2021, etc. So, let's leave out the time component. Also, it can be argued from a theoretical standpoint that the relationship between political killings, etc. and human rights performance is unaffected by time considerations (i.e., if a government kills, then it's ipso facto performing poorly HR-wise, irrespective of the time point).
 
+## 02/24/24 ##
+
+- After merging, there's a lot of missingness for the Czech Republic. V-Dem calls it "Czechia," even during the Czechoslovakia period, so it's safe to replace these values with that of Czechoslovakia's. May need to do this early on in the preprocessing.
+- Am ultimately going to change Czechoslovakia's COW code from 315 to 316 (Czechia's). Both the V-Dem and HR Scores datasets treat the latter as a continuation of the former, hence why I'm not gonig to separate the two entirely by recoding pre-1993 Czechia's years to 315 in my preprocessed dataset.
+- The microstates don't appear in the V-Dem dataset at all. Will be removing these observations wholesale.
+- Extant but marginal missingness for post-Soviet states, DDR, West Germany, etc., due to coding gaps, late coding start dates, etc. Will just remove these observations.
