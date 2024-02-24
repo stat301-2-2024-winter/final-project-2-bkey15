@@ -41,9 +41,12 @@ akt_rec |>
     )
 
 ## basic rec ----
-basic_rec <- train |> 
+### knn neighbors = 5 (default) ----
+basic_rec_5 <- train |> 
   recipe(hr_score ~ .) |> 
-  step_rm(country_name, year, PTS_A, PTS_H, PTS_S) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
@@ -55,21 +58,84 @@ basic_rec <- train |>
   step_dummy(all_nominal_predictors()) |> 
   step_zv(all_predictors()) |> 
   step_normalize(all_numeric_predictors()) |> 
-  step_impute_bag(all_predictors())
+  step_impute_knn(all_predictors())
+
+### knn neighbors = 10 ----
+basic_rec_10 <- train |> 
+  recipe(hr_score ~ .) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(year, new_role = "id variable") |> 
+  update_role(cow_year, new_role = "id variable") |> 
+  step_mutate(
+    cowcode = factor(cowcode),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
+  ) |> 
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_numeric_predictors()) |> 
+  step_impute_knn(
+    all_predictors(),
+    neighbors = 10
+    )
+
+### knn neighbors = 20
+basic_rec_20 <- train |> 
+  recipe(hr_score ~ .) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(year, new_role = "id variable") |> 
+  update_role(cow_year, new_role = "id variable") |> 
+  step_mutate(
+    cowcode = factor(cowcode),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
+  ) |> 
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_numeric_predictors()) |> 
+  step_impute_knn(
+    all_predictors(),
+    neighbors = 20
+    )
 
 ### rec check ----
 #### set seed ----
 set.seed(2612)
 
 #### complete check ----
-rec_check <- basic_rec |> 
+##### 5 neighbors ----
+rec_check <- basic_rec_5 |> 
   prep() |> 
   bake(new_data = NULL)
 
-### write rec ----
-basic_rec |> 
+##### 10 neighbors ----
+rec_check <- basic_rec_10 |> 
+  prep() |> 
+  bake(new_data = NULL)
+
+##### 20 neighbors ----
+rec_check <- basic_rec_20 |> 
+  prep() |> 
+  bake(new_data = NULL)
+
+### write recs ----
+basic_rec_5 |> 
   save(
-    file = here("data/recipes/basic_rec.rda")
+    file = here("data/recipes/basic_rec_5.rda")
   )
 
+basic_rec_10 |> 
+  save(
+    file = here("data/recipes/basic_rec_10.rda")
+  )
 
+basic_rec_20 |> 
+  save(
+    file = here("data/recipes/basic_rec_20.rda")
+  )
