@@ -1,5 +1,5 @@
-# merge_train_folds
-data/results/fits_cv/base_fits.rda
+# base_fits
+data/results/fits_cv/baselines/base_fits.rda
 
 # History files
 .Rhistory

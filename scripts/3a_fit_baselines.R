@@ -1,5 +1,6 @@
 # Final Project ----
 # Baseline fits
+# seed used for wfl_set_fits, below
 
 # load packages ----
 library(tidyverse)
@@ -60,10 +61,10 @@ akt_wflw <- workflow() |>
 ## register cores ----
 registerDoMC(cores = 8)
 
-## set seed ----
-set.seed(2612)
-
 ## complete fit ----
+#### set seed ----
+set.seed(1226)
+
 ### avg_kill_tort ----
 akt_fit <- akt_wflw |> 
   fit_resamples(
@@ -71,6 +72,7 @@ akt_fit <- akt_wflw |>
     control = control_resamples(save_workflow = TRUE)
   )
 
+#### remaining fits ----
 wfl_set_fits <- wfl_set |> 
   workflow_map(
     "fit_resamples",
@@ -83,11 +85,11 @@ wfl_set_fits <- wfl_set |>
   )
 
 ## combine fits ----
-base_fits <- as_workflow_set(akt_wflw = akt_fit) %>% 
+base_fits <- as_workflow_set(akt_lm = akt_fit) |> 
   bind_rows(wfl_set_fits)
 
-## save fit ----
+## save fits ----
 base_fits |> 
   save(
-    file = here("data/results/fits_cv/base_fits.rda")
+    file = here("data/results/fits_cv/baselines/base_fits.rda")
     )

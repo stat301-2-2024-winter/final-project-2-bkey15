@@ -58,7 +58,9 @@ basic_rec_5 <- train |>
   step_dummy(all_nominal_predictors()) |> 
   step_zv(all_predictors()) |> 
   step_normalize(all_numeric_predictors()) |> 
-  step_impute_knn(all_predictors())
+  step_impute_knn(
+    all_predictors()
+    )
 
 ### knn neighbors = 10 ----
 basic_rec_10 <- train |> 

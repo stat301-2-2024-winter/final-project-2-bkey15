@@ -42,3 +42,4 @@
 - Am ultimately going to change Czechoslovakia's COW code from 315 to 316 (Czechia's). Both the V-Dem and HR Scores datasets treat the latter as a continuation of the former, hence why I'm not gonig to separate the two entirely by recoding pre-1993 Czechia's years to 315 in my preprocessed dataset.
 - The microstates don't appear in the V-Dem dataset at all. Will be removing these observations wholesale.
 - Extant but marginal missingness for post-Soviet states, DDR, West Germany, etc., due to coding gaps, late coding start dates, etc. Will just remove these observations.
+- Important: we need to set seed for knn fits, because R will randomly break ties between observations if a tie exists.
