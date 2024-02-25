@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Brian Key">
-<meta name="dcterms.date" content="2024-02-24">
+<meta name="dcterms.date" content="2024-02-25">
 
 <title>Progress Memo 2</title>
 <style>
@@ -3074,7 +3074,7 @@ Data Science 2 with R (STAT 301-2)</div><p></p>
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 24, 2024</p>
+      <p class="date">February 25, 2024</p>
     </div>
   </div>
   
@@ -3108,12 +3108,12 @@ Github Repo Link
 <section id="baseline-fits" class="level2">
 <h2 class="anchored" data-anchor-id="baseline-fits">Baseline Fits</h2>
 <div class="cell">
-<div id="tbl-rmses" class="cell anchored">
+<div id="tbl-rmses-base" class="cell anchored">
 <figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rmses-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 1: Comparison of Best Mean RMSEs for Each Model
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rmses-base-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 1: Comparison of Mean RMSEs by Model
 </figcaption>
-<div aria-describedby="tbl-rmses-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-rmses-base-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="cell table table-sm table-striped small">
 <thead>
@@ -3169,6 +3169,60 @@ Table 1: Comparison of Best Mean RMSEs for Each Model
 </section>
 <section id="tuned-fits" class="level2">
 <h2 class="anchored" data-anchor-id="tuned-fits">Tuned Fits</h2>
+<div class="cell">
+<div id="tbl-rmses-tune" class="cell anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rmses-tune-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 2: Comparison of Best Mean RMSEs by Model
+</figcaption>
+<div aria-describedby="tbl-rmses-tune-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: right;">Mean RMSE</th>
+<th style="text-align: right;">Std. Error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">knn</td>
+<td style="text-align: right;">0.2468169</td>
+<td style="text-align: right;">0.0026787</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rf</td>
+<td style="text-align: right;">0.2940200</td>
+<td style="text-align: right;">0.0017935</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bt</td>
+<td style="text-align: right;">0.4811420</td>
+<td style="text-align: right;">0.0025977</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">en</td>
+<td style="text-align: right;">0.5658695</td>
+<td style="text-align: right;">0.0023539</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lasso</td>
+<td style="text-align: right;">0.5659204</td>
+<td style="text-align: right;">0.0023520</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ridge</td>
+<td style="text-align: right;">0.5970555</td>
+<td style="text-align: right;">0.0022715</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section>
 
 </main>

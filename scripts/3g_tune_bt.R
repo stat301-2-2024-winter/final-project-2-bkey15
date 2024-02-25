@@ -36,7 +36,7 @@ bt_spec <- boost_tree(
 # define workflows ----
 bt_wfl <- workflow() |> 
   add_model(bt_spec) |> 
-  add_recipe(bt_rec_5)
+  add_recipe(basic_rec_5)
 
 # hyperparameter tuning values ----
 bt_params <- parameters(bt_spec) |>  

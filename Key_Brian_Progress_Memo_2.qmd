@@ -49,10 +49,16 @@ The above shows shows that
 ## Baseline Fits
 
 ```{r, echo = FALSE}
-#| label: tbl-rmses
-#| tbl-cap: "Comparison of Best Mean RMSEs for Each Model"
+#| label: tbl-rmses-base
+#| tbl-cap: "Comparison of Mean RMSEs by Model"
 load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
 rmse_kbl_base_fits
 ```
 
 ## Tuned Fits
+```{r, echo = FALSE}
+#| label: tbl-rmses-tune
+#| tbl-cap: "Comparison of Best Mean RMSEs by Model"
+load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
+rmse_kbl_best_tuned
+```
