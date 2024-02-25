@@ -47,7 +47,7 @@ rf_params <- parameters(rf_spec) |>
     )
 
 ## create grid ----
-rf_grid <- bt_params |> 
+rf_grid <- rf_params |> 
   grid_regular(levels = 5)
 
 # fit workflows/models ----
@@ -58,10 +58,10 @@ registerDoMC(cores = 8)
 set.seed(1226)
 
 ## fit models ----
-bt_tuned <- bt_wfl |> 
+rf_tuned <- rf_wfl |> 
   tune_grid(
     train_folds, 
-    grid = bt_grid, 
+    grid = rf_grid, 
     control = control_grid(
       save_workflow = TRUE,
       save_pred = TRUE
@@ -69,7 +69,7 @@ bt_tuned <- bt_wfl |>
   )
 
 ## save fits ----
-bt_tuned |> 
+rf_tuned |> 
   save(
-    file = here("data/results/fits_cv/tuned/bt_tuned.rda")
+    file = here("data/results/fits_cv/tuned/rf_tuned.rda")
   )

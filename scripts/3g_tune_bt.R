@@ -58,7 +58,7 @@ bt_grid <- bt_params |>
 registerDoMC(cores = 8)
 
 ## set seed ----
-set.seed(2612)
+set.seed(1226)
 
 ## fit models ----
 bt_tuned <- bt_wfl |> 
