@@ -62,10 +62,10 @@ final_perform_stats_kbl |>
   )
 
 # plot predictions vs. actual ----
-final_test_predicts_scatt <- final_test_predicts |> 
+scatt_plot_final_predicts <- final_predicts |> 
   ggplot(
     aes(
-      x = age,
+      x = hr_score,
       y = .pred
     )
   ) +
@@ -73,21 +73,21 @@ final_test_predicts_scatt <- final_test_predicts |>
   geom_point(alpha = 0.5) +
   coord_obs_pred() +
   labs(
-    x = "Actual (Years)",
-    y = "Predicted (Years)",
-    title = "Scatterplot: Abalone Age, Actual vs. Predicted",
-    subtitle = "Predictions generated from a random-forest model",
-    caption = "Source: UC-Irvine Machine Learning Repository"
+    x = "Actual",
+    y = "Predicted",
+    title = "Scatterplot: HR Score, Actual vs. Predicted",
+    subtitle = "Predictions generated from a KNN model",
+    caption = "Sources: HR Scores (2020) & V-Dem (2023)"
   ) +
-  theme_bw()
+  theme_solarized()
 
 ## save plot
 ggsave(
-  final_test_predicts_scatt,
+  scatt_plot_final_predicts,
   width = 2587,
   height = 1787,
   units = "px",
-  file = here("exercise_1/plots/final_test_predicts_scatt.png")
+  file = here("plots/scatt_plot_final_predicts.png")
 )
 
 
