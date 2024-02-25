@@ -19,9 +19,9 @@ tidymodels_prefer()
 
 # load recipes ----
 load(here("data/recipes/akt_rec.rda"))
-load(here("data/recipes/basic_rec_5_alt2.rda"))
-load(here("data/recipes/basic_rec_10_alt2.rda"))
-load(here("data/recipes/basic_rec_20_alt2.rda"))
+load(here("data/recipes/appendices/basic_rec_5_alt2.rda"))
+load(here("data/recipes/appendices/basic_rec_10_alt2.rda"))
+load(here("data/recipes/appendices/basic_rec_20_alt2.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -91,5 +91,5 @@ base_fits_alt2 <- as_workflow_set(akt_lm = akt_fit) |>
 ## save fits ----
 base_fits_alt2 |> 
   save(
-    file = here("data/results/fits_cv/baselines/base_fits_alt2.rda")
+    file = here("data/results/fits_cv/baselines/appendices/base_fits_alt2.rda")
     )

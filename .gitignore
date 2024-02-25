@@ -2,10 +2,10 @@
 data/results/fits_cv/baselines/base_fits.rda
 
 # base_fits_alt
-data/results/fits_cv/baselines/base_fits_alt.rda
+data/results/fits_cv/baselines/appendices/base_fits_alt.rda
 
 # base_fits_alt2
-data/results/fits_cv/baselines/base_fits_alt2.rda
+data/results/fits_cv/baselines/appendices/base_fits_alt2.rda
 
 # History files
 .Rhistory

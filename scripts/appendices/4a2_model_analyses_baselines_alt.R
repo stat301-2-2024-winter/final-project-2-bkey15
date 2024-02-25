@@ -18,7 +18,7 @@ library(knitr)
 tidymodels_prefer()
 
 # load fits ----
-load(here("data/results/fits_cv/baselines/base_fits_alt.rda"))
+load(here("data/results/fits_cv/baselines/appendices/base_fits_alt.rda"))
 
 # baseline metrics ----
 ## compile ----
@@ -40,5 +40,5 @@ rmse_kbl_base_fits_alt <- metrics_base_fits_alt |>
 ## save kable ----
 rmse_kbl_base_fits_alt |> 
   save(
-    file = here("data/results/fits_cv/baselines/rmse_kbl_base_fits_alt.rda")
+    file = here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_alt.rda")
       )

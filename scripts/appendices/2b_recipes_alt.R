@@ -171,15 +171,15 @@ rec_check <- basic_rec_20_alt |>
 ### write recs ----
 basic_rec_5_alt |> 
   save(
-    file = here("data/recipes/basic_rec_5_alt.rda")
+    file = here("data/recipes/appendices/basic_rec_5_alt.rda")
   )
 
 basic_rec_10_alt |> 
   save(
-    file = here("data/recipes/basic_rec_10_alt.rda")
+    file = here("data/recipes/appendices/basic_rec_10_alt.rda")
   )
 
 basic_rec_20_alt |> 
   save(
-    file = here("data/recipes/basic_rec_20_alt.rda")
+    file = here("data/recipes/appendices/basic_rec_20_alt.rda")
   )
