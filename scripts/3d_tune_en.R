@@ -62,7 +62,7 @@ en_tuned <- en_wfl |>
     )
 
 ## save fits ----
-lasso_tuned |> 
+en_tuned |> 
   save(
-    file = here("data/results/fits_cv/tuned/lasso_tuned.rda")
+    file = here("data/results/fits_cv/tuned/en_tuned.rda")
   )

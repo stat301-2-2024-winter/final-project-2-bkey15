@@ -20,6 +20,7 @@ tidymodels_prefer()
 # load fits ----
 load(here("data/results/fits_cv/tuned/ridge_tuned.rda"))
 load(here("data/results/fits_cv/tuned/lasso_tuned.rda"))
+load(here("data/results/fits_cv/tuned/en_tuned.rda"))
 
 # best tuning params ----
 ## ridge ----
@@ -29,5 +30,12 @@ ridge_tuned |>
 ## lasso ----
 lasso_tuned |> 
   select_best(metric = "rmse")
+
+## en ----
+en_tuned |> 
+  select_best(metric = "rmse")
+
+collect_metrics(en_tuned) |> 
+  print(n = 50)
 
 ## knn ----

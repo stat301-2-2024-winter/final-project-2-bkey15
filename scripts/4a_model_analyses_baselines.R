@@ -19,8 +19,6 @@ tidymodels_prefer()
 
 # load fits ----
 load(here("data/results/fits_cv/baselines/base_fits.rda"))
-load(here("data/results/fits_cv/tuned/ridge_tuned.rda"))
-load(here("data/results/fits_cv/tuned/lasso_tuned.rda"))
 
 # baseline metrics ----
 ## compile ----
@@ -32,7 +30,7 @@ metrics_base_fits |>
     file = here("data/results/fits_cv/baselines/metrics_base_fits.rda")
     )
 
-## create RMSE kable ----
+## create kable ----
 rmse_kbl_base_fits <- metrics_base_fits |> 
   select(wflow_id, .metric, mean, std_err) |> 
   filter(.metric == "rmse") |> 
@@ -47,14 +45,3 @@ rmse_kbl_base_fits |>
   save(
     file = here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda")
       )
-
-# best tuning params ----
-## ridge ----
-ridge_tuned |> 
-  select_best(metric = "rmse")
-
-## lasso ----
-lasso_tuned |> 
-  select_best(metric = "rmse")
-collect_metrics(ridge_tuned)
-## knn ----

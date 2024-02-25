@@ -1,0 +1,58 @@
+---
+title: "Progress Memo 2"
+subtitle: |
+  | Final Project 
+  | Data Science 2 with R (STAT 301-2)
+author: "Brian Key"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    theme:
+      dark: darkly
+    
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+
+```{r, echo = FALSE}
+#| label: load-pkgs
+#| code-fold: false
+
+library(tidyverse)
+library(here)
+```
+
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+
+[Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
+
+:::
+
+## EDA of Target Variable
+
+I my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
+
+![](plots/hr_score_dist_plots.png)
+
+The above shows shows that 
+
+## Baseline Fits
+
+```{r, echo = FALSE}
+#| label: tbl-rmses
+#| tbl-cap: "Comparison of Best Mean RMSEs for Each Model"
+load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
+rmse_kbl_base_fits
+```
+
+## Tuned Fits
