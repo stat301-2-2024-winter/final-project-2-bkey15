@@ -98,7 +98,7 @@ rmse_kbl_best_tuned |>
     )
 
 # plot CIs ----
-ci_plot_mod_rank <- rmse_tbl_best_tuned |> 
+ci_plot_best_tuned <- rmse_tbl_best_tuned |> 
   ggplot(
     aes(
       x = reorder(
@@ -122,4 +122,13 @@ ci_plot_mod_rank <- rmse_tbl_best_tuned |>
     title = "Plot: Model Ranking by Best Mean RMSE",
     subtitle = "Bounds = 95% confidence interval",
   ) +
-  theme_bw()
+  theme_solarized()
+
+## save plot ----
+ggsave(
+  ci_plot_best_tuned,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/ci_plot_best_tuned.png")
+)

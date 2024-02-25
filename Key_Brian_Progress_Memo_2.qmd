@@ -62,3 +62,5 @@ rmse_kbl_base_fits
 load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
 rmse_kbl_best_tuned
 ```
+
+![](plots/ci_plot_best_tuned.png)
