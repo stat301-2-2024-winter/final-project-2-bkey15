@@ -1,8 +1,8 @@
 # base_fits
 data/results/fits_cv/baselines/base_fits.rda
 
-# base_fits_NEW
-data/results/fits_cv/baselines/base_fits_NEW.rda
+# base_fits_alt
+data/results/fits_cv/baselines/base_fits_alt.rda
 
 # History files
 .Rhistory

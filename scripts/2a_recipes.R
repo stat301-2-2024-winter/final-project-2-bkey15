@@ -40,8 +40,9 @@ akt_rec |>
     file = here("data/recipes/akt_rec.rda")
     )
 
-## basic rec ----
+## all else ----
 ### knn neighbors = 5 (default) ----
+#### basic ----
 basic_rec_5 <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
@@ -62,7 +63,32 @@ basic_rec_5 <- train |>
     all_predictors()
     )
 
+#### tree (one_hot = TRUE) ----
+tree_rec_5 <- train |> 
+  recipe(hr_score ~ .) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(year, new_role = "id variable") |> 
+  update_role(cow_year, new_role = "id variable") |> 
+  step_mutate(
+    cowcode = factor(cowcode),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
+  ) |> 
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(
+    all_nominal_predictors(),
+    one_hot = TRUE
+    ) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_numeric_predictors()) |> 
+  step_impute_knn(
+    all_predictors()
+  )
+
 ### knn neighbors = 10 ----
+#### basic ----
 basic_rec_10 <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
@@ -85,6 +111,7 @@ basic_rec_10 <- train |>
     )
 
 ### knn neighbors = 20
+#### basic ----
 basic_rec_20 <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
@@ -112,9 +139,12 @@ set.seed(2612)
 
 #### complete check ----
 ##### 5 neighbors ----
+##### basic ----
 rec_check <- basic_rec_5 |> 
   prep() |> 
   bake(new_data = NULL)
+
+##### tree ----
 
 ##### 10 neighbors ----
 rec_check <- basic_rec_10 |> 

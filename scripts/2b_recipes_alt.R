@@ -42,7 +42,7 @@ akt_rec |>
 
 ## basic rec ----
 ### knn neighbors = 5 (default) ----
-basic_rec_5_NEW <- train |> 
+basic_rec_5_alt <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(
     v2x_clphy,
@@ -77,7 +77,7 @@ basic_rec_5_NEW <- train |>
     )
 
 ### knn neighbors = 10 ----
-basic_rec_10_NEW <- train |> 
+basic_rec_10_alt <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(
     v2x_clphy,
@@ -113,7 +113,7 @@ basic_rec_10_NEW <- train |>
     )
 
 ### knn neighbors = 20
-basic_rec_20_NEW <- train |> 
+basic_rec_20_alt <- train |> 
   recipe(hr_score ~ .) |> 
   step_rm(
     v2x_clphy,
@@ -154,32 +154,32 @@ set.seed(2612)
 
 #### complete check ----
 ##### 5 neighbors ----
-rec_check <- basic_rec_5_NEW |> 
+rec_check <- basic_rec_5_alt |> 
   prep() |> 
   bake(new_data = NULL)
 
 ##### 10 neighbors ----
-rec_check <- basic_rec_10 |> 
+rec_check <- basic_rec_10_alt |> 
   prep() |> 
   bake(new_data = NULL)
 
 ##### 20 neighbors ----
-rec_check <- basic_rec_20 |> 
+rec_check <- basic_rec_20_alt |> 
   prep() |> 
   bake(new_data = NULL)
 
 ### write recs ----
-basic_rec_5_NEW |> 
+basic_rec_5_alt |> 
   save(
-    file = here("data/recipes/basic_rec_5_NEW.rda")
+    file = here("data/recipes/basic_rec_5_alt.rda")
   )
 
-basic_rec_10_NEW |> 
+basic_rec_10_alt |> 
   save(
-    file = here("data/recipes/basic_rec_10_NEW.rda")
+    file = here("data/recipes/basic_rec_10_alt.rda")
   )
 
-basic_rec_20_NEW |> 
+basic_rec_20_alt |> 
   save(
-    file = here("data/recipes/basic_rec_20_NEW.rda")
+    file = here("data/recipes/basic_rec_20_alt.rda")
   )

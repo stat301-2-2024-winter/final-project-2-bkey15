@@ -19,9 +19,9 @@ tidymodels_prefer()
 
 # load recipes ----
 load(here("data/recipes/akt_rec.rda"))
-load(here("data/recipes/basic_rec_5_NEW.rda"))
-load(here("data/recipes/basic_rec_10_NEW.rda"))
-load(here("data/recipes/basic_rec_20_NEW.rda"))
+load(here("data/recipes/basic_rec_5_alt.rda"))
+load(here("data/recipes/basic_rec_10_alt.rda"))
+load(here("data/recipes/basic_rec_20_alt.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -41,9 +41,9 @@ basic_spec <- linear_reg() |>
 ## wfl_set ----
 wfl_set <- workflow_set(
   preproc = list(
-    neighbors_5 = basic_rec_5_NEW,
-    neighbors_10 = basic_rec_10_NEW,
-    neighbors_20 = basic_rec_20_NEW
+    neighbors_5 = basic_rec_5_alt,
+    neighbors_10 = basic_rec_10_alt,
+    neighbors_20 = basic_rec_20_alt
     ),
   models = list(
     null = null_spec,
@@ -85,11 +85,11 @@ wfl_set_fits <- wfl_set |>
   )
 
 ## combine fits ----
-base_fits_NEW <- as_workflow_set(akt_lm = akt_fit) |> 
+base_fits_alt <- as_workflow_set(akt_lm = akt_fit) |> 
   bind_rows(wfl_set_fits)
 
 ## save fits ----
-base_fits_NEW |> 
+base_fits_alt |> 
   save(
-    file = here("data/results/fits_cv/baselines/base_fits_NEW.rda")
+    file = here("data/results/fits_cv/baselines/base_fits_alt.rda")
     )
