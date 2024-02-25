@@ -65,6 +65,17 @@ rmse_kbl_best_tuned
 
 ![](plots/ci_plot_best_tuned.png)
 
+## Final Fit
+
+```{r}
+load(here("data/results/final/final_perform_stats_kbl.rda"))
+final_perform_stats_kbl
+```
+
+are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/0_appendices.R`.]
+
+![](plots/scatt_plot_final_predicts.png)
+
 ## Remaining Questions
 
 ![](plots/scatt_plot_pvi.png)

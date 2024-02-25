@@ -1,6 +1,9 @@
 # base_fits
 data/results/fits_cv/baselines/base_fits.rda
 
+# base_fits_NEW
+data/results/fits_cv/baselines/base_fits_NEW.rda
+
 # History files
 .Rhistory
 .Rapp.history

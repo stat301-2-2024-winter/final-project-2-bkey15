@@ -58,7 +58,7 @@ final_perform_stats_kbl <- final_perform_stats |>
 
 final_perform_stats_kbl |> 
   save(
-    file = here("exercise_1/results/final_perform_stats_kbl.rda")
+    file = here("data/results/final/final_perform_stats_kbl.rda")
   )
 
 # plot predictions vs. actual ----

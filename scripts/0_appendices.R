@@ -19,6 +19,7 @@ tidymodels_prefer()
 
 # load data ----
 load(here("data/preprocessed/preproc_data.rda"))
+hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 
 # multicollinearity issue with avg_kill_tort and v2x_clphy? ----
 scatt_plot_pvi <- preproc_data |> 
@@ -33,7 +34,8 @@ scatt_plot_pvi <- preproc_data |>
     x = "PVI (Unscaled)",
     y = "PVI (Scaled)",
     title = "Scatterplot: Physical Violence Indices, Scaled vs. Unscaled",
-    subtitle = "Is the strong relationship a cause for concern?"
+    subtitle = "Is the strong relationship a cause for concern?",
+    caption = "Source: V-Dem (2023)"
     ) +
   theme_solarized()
 
@@ -45,4 +47,7 @@ ggsave(
   units = "px",
   file = here("plots/scatt_plot_pvi.png")
 )
+
+# mean sd of hr_score ----
+mean(hr_scores$theta_sd)
 
