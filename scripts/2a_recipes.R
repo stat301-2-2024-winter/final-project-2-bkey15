@@ -145,6 +145,9 @@ rec_check <- basic_rec_5 |>
   bake(new_data = NULL)
 
 ##### tree ----
+rec_check <- tree_rec_5 |> 
+  prep() |> 
+  bake(new_data = NULL)
 
 ##### 10 neighbors ----
 rec_check <- basic_rec_10 |> 
@@ -160,6 +163,11 @@ rec_check <- basic_rec_20 |>
 basic_rec_5 |> 
   save(
     file = here("data/recipes/basic_rec_5.rda")
+  )
+
+tree_rec_5 |> 
+  save(
+    file = here("data/recipes/tree_rec_5.rda")
   )
 
 basic_rec_10 |> 
