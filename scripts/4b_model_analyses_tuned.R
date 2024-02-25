@@ -58,6 +58,10 @@ knn_best <- knn_tuned |>
   mutate(model = "knn") |> 
   relocate(model)
 
+### BDK: check params, as this is best mod
+knn_tuned |> 
+  select_best(metric = "rmse")
+
 ## rf ----
 rf_best <- rf_tuned |> 
   show_best(metric = "rmse") |> 
