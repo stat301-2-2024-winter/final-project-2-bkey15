@@ -48,6 +48,8 @@ The above shows shows that HR Scores isn't distributed in a perfectly symmetrica
 
 ## Baseline Fits
 
+I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds. @tbl-rmses-base, below, gives the performance of my baseline fits on the cross-validation folds as measured by mean RMSE:
+
 ```{r, echo = FALSE}
 #| label: tbl-rmses-base
 #| tbl-cap: "Comparison of Mean RMSEs by Model"
@@ -55,7 +57,14 @@ load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
 rmse_kbl_base_fits
 ```
 
+My null (`null`) and basic baseline (`lm`) models have three recipes each, which each being distinguished by the number of neighbors used for KNN-imputation. Also included as a baseline is a seventh recipe (`akt_lm`), which simply uses my unweighted version of the Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Score. I do so in order to test the appropriateness of simply substituting it for HR Score.
+
+As we can see, the null models perform well-worse than the basic baseline models; the unweighted PVI baseline splits the difference between the two. There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unweighted PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Score than to use the unweighted PVI as a simple substitute for HR Score. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger number with marginal impact on our findings.
+
 ## Tuned Fits
+
+Below is @tbl-rmses-tune, which gives the mean RMSE of the tuned fits on the cross-validation folds:
+
 ```{r, echo = FALSE}
 #| label: tbl-rmses-tune
 #| tbl-cap: "Comparison of Best Mean RMSEs by Model"
@@ -63,7 +72,10 @@ load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
 rmse_kbl_best_tuned
 ```
 
-![](plots/ci_plot_best_tuned.png)
+The ridge, lasso, and elastic net models used the same recipe as that underpinning the 5-neighbor baselines seen in @tbl-rmses-base. The KNN, random forest, and boosted tree models relied on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.
+
+![CI Plot, Tuned Models](plots/ci_plot_best_tuned.png){#fig-tunerank}
+@fig-tunerank
 
 ## Final Fit
 
@@ -76,7 +88,7 @@ are themselves estimates, the mean standard deviation of which is approximately 
 
 ![](plots/scatt_plot_final_predicts.png)
 
-## Remaining Questions
+## Further Considerations
 
 ![](plots/scatt_plot_pvi.png)
 
