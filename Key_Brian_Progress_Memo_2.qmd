@@ -44,7 +44,7 @@ I my previous memo, I failed to provide a visualization of the distribution of H
 
 ![](plots/hr_score_dist_plots.png)
 
-The above shows shows that 
+The above shows shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features are relatively minor, and methods of correcting them either fail or are not applicable given the nature of the variable.^[Square-root and Box-Cox transformations only work for positive variables; a Yeo-Johnson transformation produces no significant change in the distribution; and a log-transformation results in a strong left-skew. For evidence of attempts at the latter two transformations, see...]
 
 ## Baseline Fits
 
