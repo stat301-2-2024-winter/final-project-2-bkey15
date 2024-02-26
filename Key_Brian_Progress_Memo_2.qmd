@@ -43,9 +43,15 @@ library(here)
 
 In my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
 
-![](plots/hr_score_dist_plots.png)
+![](plots/hr_score_OG_dist_plots.png)
 
-The above shows shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features are relatively minor, and methods of correcting them either fail or are not applicable given the nature of the variable.^[Square-root and Box-Cox transformations only work for positive variables; a Yeo-Johnson transformation produces no significant change in the distribution; and a log-transformation results in a strong left-skew. For evidence of attempts at the latter two transformations, see...] I proceed with HR Score unaltered, accordingly.
+The above shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features seem relatively minor, and most methods available to correct them do not apply given the nature of the variable.^[Namely, square-root, log, and Box-Cox transformations only work for positive variables, but approximately half of HR Scores' values are negative.]
+
+Below, however, is evidence that I have attempted a Yeo-Johnson transformation of HR scores:
+
+![](plots/appendices/yj_dist_plots.png)
+
+The transformation does rectify the right-skew, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature. In tandem with my present inability to compute the transformed variable's inverse post-model fitting, these considerations prompt me to proceed with HR Scores unaltered, though I welcome feedback as to whether this is the right step to take.
 
 ## Commentary on Pre-Recipe Preprocessing
 
@@ -68,10 +74,12 @@ dattbl_vdem_miss
 -   These observations mainly involve:
     1. Post-Soviet states (e.g., Armenia, Azerbaijan, etc.) and post-WWII states (e.g., West and East Germany).
     2. European microstates (e.g., Liechtenstein and Monaco) and small island states (e.g., Samoa, St. Vincent and the Grenadines, etc.).
--   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of analysis entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my work.
+-   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my work, though I again welcome feedback as to whether I've made the right choice.
 -   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
 
-Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations.
+Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:
+
+![](plots/hr_score_dist_plots.png)
 
 ## Baseline Fits
 
@@ -89,7 +97,7 @@ My null (`null`) and basic baseline (`lm`) models have three recipes each, with 
 Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
 
 -   Transforming country ID (`cowcode`) to a dummy variable.
--   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset.]
+-   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset. For evidence that I have verified this, see `scripts/appendices/0_appendices.R`.]
 -   Normalizing all numeric predictors.
 
 In aggregate, the preprocessing steps results in a training set of 227 variables: 1 outcome, 3 ID variables,^[`year`, `cow_year`, and `country_name`] and 223 predictors---179 of which are country dummies.
@@ -143,7 +151,7 @@ Below is also a scatterplot depicting the relationship between our predictions a
 
 ![](plots/scatt_plot_final_predicts.png)
 
-are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/0_appendices.R`.]
+are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.]
 
 ## Further Considerations
 

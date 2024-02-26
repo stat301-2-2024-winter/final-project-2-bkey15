@@ -24,6 +24,10 @@ vdem <- vdem |>
 ## hr_scores ----
 hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 
+hr_scores |> 
+  ggplot(aes(x = theta_mean)) +
+  geom_density()
+
 ## pts ----
 load(here("data/raw/PTS-2023.RData"))
 

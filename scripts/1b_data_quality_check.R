@@ -17,10 +17,61 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load data ----
+hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 load(here("data/preprocessed/preproc_data.rda"))
 
 # viz. hr_scores ----
-## density plot ----
+## OG obs ----
+### density plot ----
+outcome_OG_dens_plot <- hr_scores |> 
+  ggplot(
+    aes(
+      x = theta_mean
+    )
+  ) +
+  geom_density() +
+  labs(
+    x = "HR Score",
+    y = "Density"
+  ) +
+  theme_solarized()
+
+### boxplot ----
+outcome_OG_boxplot <- hr_scores |> 
+  ggplot(
+    aes(
+      x = theta_mean
+    )
+  ) +
+  geom_boxplot(
+    fill = NA,
+    alpha = 0.25
+  ) +
+  scale_y_discrete() +
+  labs(
+    x = "HR Score"
+  ) +
+  theme_solarized()
+
+### combine ----
+hr_score_OG_dist_plots <- outcome_OG_dens_plot / outcome_OG_boxplot + plot_annotation(
+  title = "Visualizing the Distribution of Human Rights Scores",
+  subtitle = "Density Plot (Top) & Boxplot (Bottom)",
+  caption = "Source: HR Scores (Fariss, 2020)",
+  theme = theme_solarized()
+)
+
+### save ----
+ggsave(
+  hr_score_OG_dist_plots,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/hr_score_OG_dist_plots.png")
+)
+
+## preprocesssed obs ----
+### density plot ----
 outcome_dens_plot <- preproc_data |> 
   ggplot(
     aes(
@@ -34,7 +85,7 @@ outcome_dens_plot <- preproc_data |>
     ) +
   theme_solarized()
 
-## boxplot ----
+### boxplot ----
 outcome_boxplot <- preproc_data |> 
   ggplot(
     aes(
@@ -51,14 +102,15 @@ outcome_boxplot <- preproc_data |>
     ) +
   theme_solarized()
 
-## combine ----
+### combine ----
 hr_score_dist_plots <- outcome_dens_plot / outcome_boxplot + plot_annotation(
-  title = "Visualizing the Distribution of Human Rights Scores",
+  title = "Distribution of Human Rights Scores after Preprocessing",
     subtitle = "Density Plot (Top) & Boxplot (Bottom)",
     caption = "Source: HR Scores (Fariss, 2020)",
     theme = theme_solarized()
   )
 
+### save ----
 ggsave(
   hr_score_dist_plots,
   width = 2587,
@@ -66,12 +118,3 @@ ggsave(
   units = "px",
   file = here("plots/hr_score_dist_plots.png")
 )
-
-preproc_data |> 
-  ggplot(
-    aes(
-      x = log10(e_gdppc)
-    )
-  ) +
-  geom_density()
-
