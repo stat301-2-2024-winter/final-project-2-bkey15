@@ -223,7 +223,25 @@ preproc_data <- preproc_data |>
     )
 
 # final missingness check ----
-gg_miss_var(preproc_data)
+preproc_miss_plot <- preproc_data |> 
+  select(
+    -starts_with("PTS")
+    ) |> 
+  gg_miss_var() +
+  labs(
+    title = "Plot: Missing Observations by Predictor in the Preprocessed Dataset",
+    caption = "Source: V-Dem (2023)"
+    ) +
+  theme_solarized()
+
+## save ----
+ggsave(
+  preproc_miss_plot,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/preproc_miss_plot.png")
+)
 
 # save preproc_data ----
 preproc_data |> 

@@ -61,7 +61,7 @@ Prior to writing my recipes, I complete the following noteworthy preprocessing s
 -   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this to be justifiable on two counts:
     1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
     2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
--   Systematically remove country-years that appear in HR Scores but not in V-Dem---cases shown in @tbl-vdem-miss, below:
+-   Remove country-years that appear in HR Scores but are systematically absent in V-Dem---cases shown in @tbl-vdem-miss, below:
 
 
 ```{r, echo = FALSE}
@@ -77,9 +77,13 @@ dattbl_vdem_miss
 -   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my projections, though I again welcome feedback as to whether I've made the right choice.
 -   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
 
-Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:
+Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:^[Admittedly, the distribution might be marginally more right-skewed; this likely owes itself to the removal of the European microstates, whose human rights levels are generally very high.]
 
 ![](plots/hr_score_dist_plots.png)
+
+The preprocessed dataset also exhibits a low degree of missingness, as demonstrated by the plot below, meaning that the computational demands for our imputations should be rather low in turn:
+
+![](plots/preproc_miss_plot.png)
 
 ## Baseline Fits
 
