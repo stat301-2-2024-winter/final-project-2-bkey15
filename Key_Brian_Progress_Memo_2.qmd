@@ -72,21 +72,41 @@ load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
 rmse_kbl_best_tuned
 ```
 
-The ridge, lasso, and elastic net models used the same recipe as that underpinning the 5-neighbor baselines seen in @tbl-rmses-base. The KNN, random forest, and boosted tree models relied on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.
+The ridge, lasso, and elastic-net models used the same recipe as that underpinning the 5-neighbor baselines seen in @tbl-rmses-base. The KNN, random forest, and boosted tree models relied on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.
 
-![CI Plot, Tuned Models](plots/ci_plot_best_tuned.png){#fig-tunerank}
-@fig-tunerank
+The optimal tuning parameters for these models as assessed by mean RMSE were, respectively:
+
+-   KNN: `neighbors = 4`
+-   Random Forest: `mtry = 14`, `min_n = 2`
+-   Boosted Tree: `mtry = 14`, `min_n = 2`, `learn_rate = 0.631`
+-   Elastic Net: `penalty = 0.0000000001`, `mixture = 0.762`
+-   Lasso: `penalty = 0.0000000001`
+-   Ridge: `penalty = 0.0000000001`
+
+Below is also a plot depicting the confidence intervals for each estimate:
+
+![](plots/ci_plot_best_tuned.png)
+
+@tbl-rmses-tune and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
 
 ## Final Fit
 
+@tbl-metrics-final, below, gives the performance metrics for the final fit applied to the testing set:
+
 ```{r}
+#| label: tbl-metrics-final
+#| tbl-cap: "Performance Metrics from Final Fit"
 load(here("data/results/final/final_perform_stats_kbl.rda"))
 final_perform_stats_kbl
 ```
 
-are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/0_appendices.R`.]
+The RMSE is even lower when compared to the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.97, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 49%, but this is a small figure in absolute terms, for the preponderance of HR scores cluster around 0.)
+
+Below is also a scatterplot depicting the relationship between our predictions and actual values in the testing set, illustrating the close fit---and hence high degree of accuracy---of our final model:
 
 ![](plots/scatt_plot_final_predicts.png)
+
+are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/0_appendices.R`.]
 
 ## Further Considerations
 

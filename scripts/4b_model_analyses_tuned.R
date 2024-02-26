@@ -34,6 +34,9 @@ ridge_best <- ridge_tuned |>
   mutate(model = "ridge") |> 
   relocate(model)
 
+ridge_tuned |> 
+  select_best(metric = "rmse")
+
 ## lasso ----
 lasso_best <- lasso_tuned |> 
   show_best(metric = "rmse") |> 
@@ -41,6 +44,9 @@ lasso_best <- lasso_tuned |>
   select(mean, std_err) |> 
   mutate(model = "lasso") |> 
   relocate(model)
+
+lasso_tuned |> 
+  select_best(metric = "rmse")
 
 ## en ----
 en_best <- en_tuned |> 
@@ -50,6 +56,9 @@ en_best <- en_tuned |>
   mutate(model = "en") |> 
   relocate(model)
 
+en_tuned |> 
+  select_best(metric = "rmse")
+
 ## knn ----
 knn_best <- knn_tuned |> 
   show_best(metric = "rmse") |> 
@@ -58,7 +67,6 @@ knn_best <- knn_tuned |>
   mutate(model = "knn") |> 
   relocate(model)
 
-### BDK: check params, as this is best mod
 knn_tuned |> 
   select_best(metric = "rmse")
 
@@ -70,6 +78,9 @@ rf_best <- rf_tuned |>
   mutate(model = "rf") |> 
   relocate(model)
 
+rf_tuned |> 
+  select_best(metric = "rmse")
+
 ## bt ----
 bt_best <- bt_tuned |> 
   show_best(metric = "rmse") |> 
@@ -77,6 +88,9 @@ bt_best <- bt_tuned |>
   select(mean, std_err) |> 
   mutate(model = "bt") |> 
   relocate(model)
+
+bt_tuned |> 
+  select_best(metric = "rmse")
 
 # create best models tbl ----
 rmse_tbl_best_tuned <- rbind(
