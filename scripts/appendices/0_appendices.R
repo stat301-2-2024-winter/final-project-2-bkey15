@@ -29,7 +29,7 @@ scatt_plot_pvi <- preproc_data |>
       y = v2x_clphy
       )
     ) +
-  geom_point() +
+  geom_point(alpha = 0.25) +
   labs(
     x = "PVI (Unscaled)",
     y = "PVI (Scaled)",

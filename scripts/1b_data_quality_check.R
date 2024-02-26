@@ -41,7 +41,10 @@ outcome_boxplot <- preproc_data |>
       x = hr_score
       )
     ) +
-  geom_boxplot() +
+  geom_boxplot(
+    fill = NA,
+    alpha = 0.25
+    ) +
   scale_y_discrete() +
   labs(
     x = "HR Score"

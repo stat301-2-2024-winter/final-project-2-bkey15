@@ -27,6 +27,7 @@ citation-location: margin
 #| code-fold: false
 
 library(tidyverse)
+library(DT)
 library(here)
 ```
 
@@ -40,11 +41,37 @@ library(here)
 
 ## EDA of Target Variable
 
-I my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
+In my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
 
 ![](plots/hr_score_dist_plots.png)
 
-The above shows shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features are relatively minor, and methods of correcting them either fail or are not applicable given the nature of the variable.^[Square-root and Box-Cox transformations only work for positive variables; a Yeo-Johnson transformation produces no significant change in the distribution; and a log-transformation results in a strong left-skew. For evidence of attempts at the latter two transformations, see...]
+The above shows shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features are relatively minor, and methods of correcting them either fail or are not applicable given the nature of the variable.^[Square-root and Box-Cox transformations only work for positive variables; a Yeo-Johnson transformation produces no significant change in the distribution; and a log-transformation results in a strong left-skew. For evidence of attempts at the latter two transformations, see...] I proceed with HR Score unaltered, accordingly.
+
+## Commentary on Pre-Recipe Preprocessing
+
+Prior to writing my recipes, I complete the following noteworthy preprocessing steps:
+
+-   Merge the V-Dem, HR Scores, and Political Terror Scale (PTS) datasets. I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.
+-   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this to be justifiable on two counts:
+    1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
+    2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
+-   Systematically remove country-years that appear in HR Scores but not in V-Dem---cases shown in @tbl-vdem-miss, below:
+
+
+```{r, echo = FALSE}
+#| label: tbl-vdem-miss
+#| tbl-cap: "N Missing from V-Dem by Country"
+load(here("data/preprocessed/dattbl_vdem_miss.rda"))
+dattbl_vdem_miss
+```
+
+-   These observations mainly involve:
+    1. Post-Soviet states (e.g., Armenia, Azerbaijan, etc.) and post-WWII states (e.g., West and East Germany).
+    2. European microstates (e.g., Liechtenstein and Monaco) and small island states (e.g., Samoa, St. Vincent and the Grenadines, etc.).
+-   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of analysis entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my work.
+-   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
+
+Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations.
 
 ## Baseline Fits
 
@@ -57,7 +84,17 @@ load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
 rmse_kbl_base_fits
 ```
 
-My null (`null`) and basic baseline (`lm`) models have three recipes each, which each being distinguished by the number of neighbors used for KNN-imputation. Also included as a baseline is a seventh recipe (`akt_lm`), which simply uses my unweighted version of the Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Score. I do so in order to test the appropriateness of simply substituting it for HR Score.
+My null (`null`) and basic baseline (`lm`) models have three recipes each, with each being distinguished by the number of neighbors used for KNN-imputation.
+
+Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
+
+-   Transforming country ID (`cowcode`) to a dummy variable.
+-   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset.]
+-   Normalizing all numeric predictors.
+
+In aggregate, the preprocessing steps results in a training set of 227 variables: 1 outcome, 3 ID variables,^[`year`, `cow_year`, and `country_name`] and 223 predictors---179 of which are country dummies.
+
+Also included as a baseline is a seventh recipe (`akt_lm`), which simply uses my unweighted version of the Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Score. I do so in order to test the appropriateness of merely substituting it for HR Score.
 
 As we can see, the null models perform well-worse than the basic baseline models; the unweighted PVI baseline splits the difference between the two. There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unweighted PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Score than to use the unweighted PVI as a simple substitute for HR Score. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger number with marginal impact on our findings.
 
@@ -72,7 +109,7 @@ load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
 rmse_kbl_best_tuned
 ```
 
-The ridge, lasso, and elastic-net models used the same recipe as that underpinning the 5-neighbor baselines seen in @tbl-rmses-base. The KNN, random forest, and boosted tree models relied on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.
+The ridge, lasso, and elastic-net models use the same recipe as that underpinning the 5-neighbor baselines seen in @tbl-rmses-base. The KNN, random forest, and boosted tree models rely on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.^[This means that the total number of predictors leveraged by these models is 224---one more than that of the others.]
 
 The optimal tuning parameters for these models as assessed by mean RMSE were, respectively:
 

@@ -70,7 +70,7 @@ scatt_plot_final_predicts <- final_predicts |>
     )
   ) +
   geom_abline(lty = 2) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.25) +
   coord_obs_pred() +
   labs(
     x = "Actual",

@@ -186,7 +186,7 @@ preproc_data <- preproc_data |>
 gg_miss_var(preproc_data)
 
 ## BDK: we have missingness in a lot of the v-dem vars. Let's check where avg_kill_tort is missing:
-preproc_data |> 
+dattbl_vdem_miss <- preproc_data |> 
   select(cowcode, country_name, avg_kill_tort) |> 
   summarize(
     n_miss = n_miss(avg_kill_tort),
@@ -203,6 +203,14 @@ preproc_data |>
     )
 
 ## BDK: microstates + post-Soviet/WWII states. The microstates basically have no data whatsoever, so we may need to remove them entirely. We can also remove missing rows for the latter; see notes, but these generally result from coding gaps, coding start dates, etc.
+
+## save data table ----
+dattbl_vdem_miss |> 
+  save(
+    file = here("data/preprocessed/dattbl_vdem_miss.rda")
+    )
+
+dattbl_vdem_miss
 
 # remove missing rows ----
 preproc_data <- preproc_data |> 
