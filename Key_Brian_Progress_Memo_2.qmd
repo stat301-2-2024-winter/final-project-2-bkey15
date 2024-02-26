@@ -74,7 +74,7 @@ dattbl_vdem_miss
 -   These observations mainly involve:
     1. Post-Soviet states (e.g., Armenia, Azerbaijan, etc.) and post-WWII states (e.g., West and East Germany).
     2. European microstates (e.g., Liechtenstein and Monaco) and small island states (e.g., Samoa, St. Vincent and the Grenadines, etc.).
--   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my work, though I again welcome feedback as to whether I've made the right choice.
+-   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my projections, though I again welcome feedback as to whether I've made the right choice.
 -   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
 
 Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:
@@ -145,15 +145,17 @@ load(here("data/results/final/final_perform_stats_kbl.rda"))
 final_perform_stats_kbl
 ```
 
-The RMSE is even lower when compared to the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.97, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 49%, but this is a small figure in absolute terms, for the preponderance of HR scores cluster around 0.)
+The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.97, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 49%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
 
-Below is also a scatterplot depicting the relationship between our predictions and actual values in the testing set, illustrating the close fit---and hence high degree of accuracy---of our final model:
+The RMSE of approximately 0.23 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed approximately by $0.23*2$.] then, represents only about `r round(((0.2301009*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.23 does not seem to mean much either. Indeed, there are several examples of countries that experienced such a score change over one year without experiencing, to my knowledge, any drastic changes in their underlying political milieus.^[For examples, see `scripts/appendices/0_appendices.R`.]
+
+To round off this discussion is the below scatterplot, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
 
 ![](plots/scatt_plot_final_predicts.png)
 
-are themselves estimates, the mean standard deviation of which is approximately `r round(0.3338768, digits = 2)`.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.]
-
 ## Further Considerations
+
+At this stage, I feel as though my final project is more or less complete.
 
 ![](plots/scatt_plot_pvi.png)
 

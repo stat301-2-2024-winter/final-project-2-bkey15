@@ -125,6 +125,27 @@ preproc_data |>
   ) +
   geom_density()
 
+# data range ----
+min(hr_scores$theta_mean)
+max(hr_scores$theta_mean)
+
 # mean sd of hr_score ----
 mean(hr_scores$theta_sd)
 
+# 0.23 RMSE diff check ----
+preproc_data <- preproc_data |> 
+  mutate(
+    hr_lag = dplyr::lag(hr_score),
+    hr_lag_diff_abs = abs(hr_score - hr_lag)
+  ) |> 
+  relocate(
+    hr_lag,
+    .after = hr_score
+  ) |> 
+  relocate(
+    hr_lag_diff_abs,
+    .after = hr_lag
+  )
+
+rmse_diff_check <- preproc_data |> 
+  filter(hr_lag_diff_abs > 0.229 & hr_lag_diff_abs < 0.231)

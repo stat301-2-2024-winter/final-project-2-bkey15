@@ -89,5 +89,3 @@ ggsave(
   units = "px",
   file = here("plots/scatt_plot_final_predicts.png")
 )
-
-
