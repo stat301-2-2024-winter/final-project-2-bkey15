@@ -109,7 +109,7 @@ Aside from KNN-imputation, the main preprocessing components shared by each reci
 -   Normalizing all numeric predictors.
 -   Removing the year dummies subsequent to KNN-imputation.
 
-This final step is important. Year can be used as an imputation predictor for future V-Dem observations, as the dataset will almost certainly continue to be produced;^[The 2024 V-Dem Dataset is scheduled to be released on 07 March 2024.] yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, there is no way to estimate baseline levels of HR Scores for "2023," "2024," etc., when there exists wholesale missingness of said variable for those years.]
+This final step is important. Year can be used as an imputation predictor for future V-Dem observations, as the dataset will almost certainly continue to be produced;^[The 2024 V-Dem Dataset is scheduled to be released on 07 March 2024.] yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, there is no way to estimate the effect of "2023," "2024," etc. on HR Scores when there exists wholesale missingness of said variable for those years.]
 
 In aggregate, the preprocessing steps results in a training set of 226 variables: 1 outcome, 2 ID variables,^[`country_name` and `cow_year`] and 223 predictors---179 of which are country dummies.
 
@@ -152,12 +152,12 @@ The ridge, lasso, and elastic-net models use the same recipe as that underpinnin
 
 The optimal tuning parameters for these models as assessed by mean RMSE were, respectively:
 
--   KNN: `neighbors = 4`
+-   KNN: `neighbors = 2`
 -   Random Forest: `mtry = 14`, `min_n = 2`
 -   Boosted Tree: `mtry = 14`, `min_n = 2`, `learn_rate = 0.631`
--   Elastic Net: `penalty = 0.0000000001`, `mixture = 0.762`
--   Lasso: `penalty = 0.0000000001`
--   Ridge: `penalty = 0.0000000001`
+-   Elastic Net: `penalty = 1e-10`, `mixture = 0.683`
+-   Lasso: `penalty = 1e-10`
+-   Ridge: `penalty = 1e-10`
 
 Below is also a plot depicting the confidence intervals for each estimate:
 
@@ -176,9 +176,9 @@ load(here("data/results/final/final_perform_stats_kbl.rda"))
 final_perform_stats_kbl
 ```
 
-The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.97, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 49%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
+The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.975, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 51.2\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
 
-The RMSE of approximately 0.23 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed approximately by $0.23*2$.] then, represents only about `r round(((0.2301009*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.23 does not seem to mean much either. Indeed, there are several examples of countries that experienced such a score change over one year without experiencing, to my knowledge, any drastic changes in their underlying political milieus.^[For examples, see `scripts/appendices/0_appendices.R`.]
+The RMSE of approximately 0.227 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed approximately by $0.227*2$.] then, represents only about `r round(((0.2271517*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.227 does not seem to mean much either. Indeed, there are several examples of countries that experienced such a score change over one year without experiencing, to my knowledge, any drastic changes in their underlying political milieus.^[For examples, see `scripts/appendices/0_appendices.R`.]
 
 To round off this discussion is the below scatterplot, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
 
