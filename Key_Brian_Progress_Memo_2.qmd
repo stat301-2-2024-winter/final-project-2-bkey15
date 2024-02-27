@@ -41,7 +41,7 @@ library(here)
 
 :::
 
-## EDA of Target Variable
+## EDA of Target Variable {#sec-eda}
 
 In my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
 
@@ -55,7 +55,7 @@ Below, however, is evidence that I have attempted a Yeo-Johnson transformation o
 
 The transformation does rectify the right-skew, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature. In tandem with my present inability to compute the transformed variable's inverse subsequent to model fitting, these considerations prompt me to proceed with HR Scores unaltered, though I welcome feedback as to whether this is the right step to take.
 
-## Pre-Recipe Preprocessing
+## Pre-Recipe Preprocessing {#sec-preproc}
 
 Prior to writing my recipes, I complete the following noteworthy preprocessing steps:
 
@@ -204,7 +204,7 @@ To round off this discussion is the below scatterplot, which depicts the relatio
 
 ## Further Considerations and Remaining Questions
 
-At this stage, I feel as though my final project is more or less complete.
+At this stage, I feel as though my final project is more or less complete. Aside from the issues I've already identified as (potentially) meriting feedback---namely, Yeo-Johnson transformation of the outcome (@sec-eda) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
 
 ![](plots/scatt_plot_pvi.png)
 
