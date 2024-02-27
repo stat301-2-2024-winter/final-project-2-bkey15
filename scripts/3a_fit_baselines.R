@@ -19,9 +19,9 @@ tidymodels_prefer()
 
 # load recipes ----
 load(here("data/recipes/akt_rec.rda"))
-load(here("data/recipes/basic_rec_5.rda"))
-load(here("data/recipes/basic_rec_10.rda"))
-load(here("data/recipes/basic_rec_20.rda"))
+load(here("data/recipes/rec_imp_5.rda"))
+load(here("data/recipes/rec_imp_10.rda"))
+load(here("data/recipes/rec_imp_20.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -41,9 +41,9 @@ basic_spec <- linear_reg() |>
 ## wfl_set ----
 wfl_set <- workflow_set(
   preproc = list(
-    neighbors_5 = basic_rec_5,
-    neighbors_10 = basic_rec_10,
-    neighbors_20 = basic_rec_20
+    neighbors_5 = rec_imp_5,
+    neighbors_10 = rec_imp_10,
+    neighbors_20 = rec_imp_20
     ),
   models = list(
     null = null_spec,

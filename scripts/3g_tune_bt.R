@@ -19,7 +19,7 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/tree_rec_5.rda"))
+load(here("data/recipes/rec_tree_imp_5.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -36,7 +36,7 @@ bt_spec <- boost_tree(
 # define workflows ----
 bt_wfl <- workflow() |> 
   add_model(bt_spec) |> 
-  add_recipe(tree_rec_5)
+  add_recipe(rec_tree_imp_5)
 
 # hyperparameter tuning values ----
 bt_params <- parameters(bt_spec) |>  

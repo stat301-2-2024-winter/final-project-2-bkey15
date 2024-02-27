@@ -18,7 +18,7 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/basic_rec_5.rda"))
+load(here("data/recipes/rec_imp_5.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -35,14 +35,14 @@ ridge_spec <-
 # define workflows ----
 ridge_wfl <- workflow() |> 
   add_model(ridge_spec) |> 
-  add_recipe(basic_rec_5)
+  add_recipe(rec_imp_5)
 
 # hyperparameter tuning values ----
 ridge_params <- parameters(ridge_spec)
 
 ## create grid ----
 ridge_grid <- ridge_params |> 
-  grid_regular(levels = 5)
+  grid_regular(levels = 10)
 
 # fit workflows/models ----
 ## register cores ----

@@ -18,7 +18,7 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/tree_rec_5.rda"))
+load(here("data/recipes/rec_tree_imp_5.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -33,14 +33,14 @@ knn_spec <- nearest_neighbor(
 # define workflows ----
 knn_wfl <- workflow() |> 
   add_model(knn_spec) |> 
-  add_recipe(tree_rec_5)
+  add_recipe(rec_tree_imp_5)
 
 # hyperparameter tuning values ----
 knn_params <- parameters(knn_spec)
 
 ## create grid ----
 knn_grid <- knn_params |> 
-  grid_regular(levels = 5)
+  grid_regular(levels = 10)
 
 # fit workflows/models ----
 ## register cores ----

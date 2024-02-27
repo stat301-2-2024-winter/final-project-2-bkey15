@@ -17,7 +17,7 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/basic_rec_5.rda"))
+load(here("data/recipes/rec_imp_5.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -34,14 +34,14 @@ lasso_spec <-
 # define workflows ----
 lasso_wfl <- workflow() |> 
   add_model(lasso_spec) |> 
-  add_recipe(basic_rec_5)
+  add_recipe(rec_imp_5)
 
 # hyperparameter tuning values ----
 lasso_params <- parameters(lasso_spec)
 
 ## create grid ----
 lasso_grid <- lasso_params |> 
-  grid_regular(levels = 5)
+  grid_regular(levels = 10)
 
 # fit workflows/models ----
 ## register cores ----

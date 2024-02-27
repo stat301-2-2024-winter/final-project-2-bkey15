@@ -57,7 +57,7 @@ The transformation does rectify the right-skew, if at the expense of introducing
 
 Prior to writing my recipes, I complete the following noteworthy preprocessing steps:
 
--   Merge the V-Dem, HR Scores, and Political Terror Scale (PTS) datasets. I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.
+-   Merge the V-Dem, HR Scores, and Political Terror Scale (PTS) datasets. At the outset, I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.
 -   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this to be justifiable on two counts:
     1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
     2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
@@ -85,9 +85,13 @@ The preprocessed dataset also exhibits a low degree of missingness, as demonstra
 
 ![](plots/preproc_miss_plot.png)
 
+## Data Splitting Specifications
+
+I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds. 
+
 ## Baseline Fits
 
-I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds. @tbl-rmses-base, below, gives the performance of my baseline fits on the cross-validation folds as measured by mean RMSE:
+@tbl-rmses-base, below, gives the performance of my baseline fits on the cross-validation folds as measured by mean RMSE:
 
 ```{r, echo = FALSE}
 #| label: tbl-rmses-base
@@ -112,7 +116,18 @@ As we can see, the null models perform well-worse than the basic baseline models
 
 ## Tuned Fits
 
-Below is @tbl-rmses-tune, which gives the mean RMSE of the tuned fits on the cross-validation folds:
+I subsequently tune the following hyperparameters for six models on the cross-validation folds:
+
+1.    Ridge: `penalty`
+2.    Lasso: `penalty`
+3.    Elastic Net: `penalty` and `mixture`
+4.    KNN: `neighbors`
+5.    Random Forest: `mtry` and `min_n`
+6.    Boosted Tree: `mtry`, `min_n`, and `learn_rate`
+
+For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`.
+
+Below is @tbl-rmses-tune, which gives the best mean RMSE of each tuned fit:
 
 ```{r, echo = FALSE}
 #| label: tbl-rmses-tune
@@ -157,7 +172,7 @@ To round off this discussion is the below scatterplot, which depicts the relatio
 
 ![](plots/scatt_plot_final_predicts.png)
 
-## Further Considerations
+## Further Considerations and Remaining Questions
 
 At this stage, I feel as though my final project is more or less complete.
 
