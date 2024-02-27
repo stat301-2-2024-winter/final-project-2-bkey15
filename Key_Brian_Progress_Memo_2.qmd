@@ -61,7 +61,7 @@ Prior to writing my recipes, I complete the following noteworthy preprocessing s
 -   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this to be justifiable on two counts:
     1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
     2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
--   Remove country-years that appear in HR Scores but are systematically absent in V-Dem---cases shown in @tbl-vdem-miss, below:
+-   Remove country-years that appear in HR Scores but are systematically absent in V-Dem---cases where the value on "N Missing" is positive as shown in @tbl-vdem-miss, below:
 
 
 ```{r, echo = FALSE}
@@ -104,11 +104,14 @@ My null (`null`) and basic baseline (`lm`) models have three recipes each, with 
 
 Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
 
--   Transforming country ID (`cowcode`) to a dummy variable.
+-   Transforming country ID (`cowcode`) and year to a dummy variable.
 -   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset. For evidence that I have verified this, see `scripts/appendices/0_appendices.R`.]
 -   Normalizing all numeric predictors.
+-   Removing the year dummies subsequent to KNN-imputation.
 
-In aggregate, the preprocessing steps results in a training set of 227 variables: 1 outcome, 3 ID variables,^[`year`, `cow_year`, and `country_name`] and 223 predictors---179 of which are country dummies.
+This final step is important. Year can be used as an imputation predictor for future V-Dem observations, as the dataset will almost certainly continue to be produced;^[The 2024 V-Dem Dataset is scheduled to be released on 07 March 2024.] yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, there is no way to estimate baseline levels of HR Scores for "2023," "2024," etc., when there exists wholesale missingness of said variable for those years.]
+
+In aggregate, the preprocessing steps results in a training set of 226 variables: 1 outcome, 2 ID variables,^[`country_name` and `cow_year`] and 223 predictors---179 of which are country dummies.
 
 Also included as a baseline is a seventh recipe (`akt_lm`), which simply uses my unweighted version of the Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Score. I do so in order to test the appropriateness of merely substituting it for HR Score.
 
@@ -125,7 +128,16 @@ I subsequently tune the following hyperparameters for six models on the cross-va
 5.    Random Forest: `mtry` and `min_n`
 6.    Boosted Tree: `mtry`, `min_n`, and `learn_rate`
 
-For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`.
+For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`. The random forest model further uses `trees = 1000` and an `mtry` range set to `c(1, 14)`, whereas the boosted tree model uses the same `mtry` range and a `learn_rate` range set to `c(-5, -0.2)`.
+
+The processing times for these models, with parallel processing across eight cores where possible, were approximately as follows:^[I simply timed these with my computer's clock.]
+
+1.    Ridge: 5 minutes
+2.    Lasso: 4 minutes
+3.    Elastic Net: 9 minutes
+4.    KNN: 12 minutes
+5.    Random Forest: 92 minutes
+6.    Boosted Tree: 
 
 Below is @tbl-rmses-tune, which gives the best mean RMSE of each tuned fit:
 

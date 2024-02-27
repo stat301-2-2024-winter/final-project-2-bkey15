@@ -46,7 +46,6 @@ rec_imp_5 <- train |>
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
@@ -71,7 +70,6 @@ rec_tree_imp_5 <- train |>
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
@@ -99,7 +97,6 @@ rec_imp_10 <- train |>
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
@@ -125,7 +122,6 @@ rec_imp_20 <- train |>
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
