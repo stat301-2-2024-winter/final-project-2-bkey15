@@ -1,5 +1,5 @@
 # Final Project ----
-# Recipe creation
+# Recipe creation, least multicollinearity averse
 
 # Seed set and used for recipe check (imputation w/ bagged trees)
 
@@ -22,48 +22,16 @@ tidymodels_prefer()
 load(here("data/splits/train.rda"))
 
 # create recipes ----
-## avg_kill_tort only ----
-akt_rec <- train |> 
-  recipe(hr_score ~ avg_kill_tort + cow_year) |> 
-  update_role(cow_year, new_role = "id variable") |> 
-  step_zv(all_predictors()) |> 
-  step_normalize(all_predictors())
-
-### rec check ----
-akt_rec |> 
-  prep() |> 
-  bake(new_data = NULL)
-
-### write rec ----
-akt_rec |> 
-  save(
-    file = here("data/recipes/akt_rec.rda")
-    )
-
-## basic rec ----
+## least averse ----
 ### knn neighbors = 5 (default) ----
-basic_rec_5_alt <- train |> 
+rec_la_imp_5 <- train |> 
   recipe(hr_score ~ .) |> 
-  step_rm(
-    v2x_clphy,
-    e_v2x_clphy_3C,
-    e_v2x_clphy_4C,
-    e_v2x_clphy_5C,
-    e_v2xcl_rol_3C,
-    e_v2xcl_rol_4C,
-    e_v2xcl_rol_5C,
-    e_v2x_civlib_3C,
-    e_v2x_civlib_4C,
-    e_v2x_civlib_5C,
-    PTS_A,
-    PTS_H,
-    PTS_S
-    ) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
+    year = factor(year),
     log10_e_pop = log10(e_pop),
     log10_e_gdp = log10(e_gdp),
     log10_e_gdppc = log10(e_gdppc)
@@ -74,35 +42,25 @@ basic_rec_5_alt <- train |>
   step_normalize(all_numeric_predictors()) |> 
   step_impute_knn(
     all_predictors()
+    ) |> 
+  step_rm(
+    starts_with("year"),
+    v2x_clphy
     )
 
 ### knn neighbors = 10 ----
-basic_rec_10_alt <- train |> 
+rec_la_imp_10 <- train |> 
   recipe(hr_score ~ .) |> 
-  step_rm(
-    v2x_clphy,
-    e_v2x_clphy_3C,
-    e_v2x_clphy_4C,
-    e_v2x_clphy_5C,
-    e_v2xcl_rol_3C,
-    e_v2xcl_rol_4C,
-    e_v2xcl_rol_5C,
-    e_v2x_civlib_3C,
-    e_v2x_civlib_4C,
-    e_v2x_civlib_5C,
-    PTS_A,
-    PTS_H,
-    PTS_S
-    ) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
+    year = factor(year),
     log10_e_pop = log10(e_pop),
     log10_e_gdp = log10(e_gdp),
     log10_e_gdppc = log10(e_gdppc)
-  ) |> 
+    ) |> 
   step_rm(e_pop, e_gdp, e_gdppc) |> 
   step_dummy(all_nominal_predictors()) |> 
   step_zv(all_predictors()) |> 
@@ -110,35 +68,25 @@ basic_rec_10_alt <- train |>
   step_impute_knn(
     all_predictors(),
     neighbors = 10
+    ) |> 
+  step_rm(
+    starts_with("year"),
+    v2x_clphy
     )
 
 ### knn neighbors = 20
-basic_rec_20_alt <- train |> 
+rec_la_imp_20 <- train |> 
   recipe(hr_score ~ .) |> 
-  step_rm(
-    v2x_clphy,
-    e_v2x_clphy_3C,
-    e_v2x_clphy_4C,
-    e_v2x_clphy_5C,
-    e_v2xcl_rol_3C,
-    e_v2xcl_rol_4C,
-    e_v2xcl_rol_5C,
-    e_v2x_civlib_3C,
-    e_v2x_civlib_4C,
-    e_v2x_civlib_5C,
-    PTS_A,
-    PTS_H,
-    PTS_S
-    ) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
-  update_role(year, new_role = "id variable") |> 
   update_role(cow_year, new_role = "id variable") |> 
   step_mutate(
     cowcode = factor(cowcode),
+    year = factor(year),
     log10_e_pop = log10(e_pop),
     log10_e_gdp = log10(e_gdp),
     log10_e_gdppc = log10(e_gdppc)
-  ) |> 
+    ) |> 
   step_rm(e_pop, e_gdp, e_gdppc) |> 
   step_dummy(all_nominal_predictors()) |> 
   step_zv(all_predictors()) |> 
@@ -146,6 +94,10 @@ basic_rec_20_alt <- train |>
   step_impute_knn(
     all_predictors(),
     neighbors = 20
+    ) |> 
+  step_rm(
+    starts_with("year"),
+    v2x_clphy
     )
 
 ### rec check ----
@@ -154,7 +106,7 @@ set.seed(2612)
 
 #### complete check ----
 ##### 5 neighbors ----
-rec_check <- basic_rec_5_alt |> 
+rec_check <- rec_la_imp_5 |> 
   prep() |> 
   bake(new_data = NULL)
 
@@ -169,17 +121,17 @@ rec_check <- basic_rec_20_alt |>
   bake(new_data = NULL)
 
 ### write recs ----
-basic_rec_5_alt |> 
+rec_la_imp_5 |> 
   save(
-    file = here("data/recipes/appendices/basic_rec_5_alt.rda")
+    file = here("data/recipes/appendices/rec_la_imp_5.rda")
   )
 
-basic_rec_10_alt |> 
+rec_la_imp_10 |> 
   save(
-    file = here("data/recipes/appendices/basic_rec_10_alt.rda")
+    file = here("data/recipes/appendices/rec_la_imp_10.rda")
   )
 
-basic_rec_20_alt |> 
+rec_la_imp_20 |> 
   save(
-    file = here("data/recipes/appendices/basic_rec_20_alt.rda")
+    file = here("data/recipes/appendices/rec_la_imp_20.rda")
   )

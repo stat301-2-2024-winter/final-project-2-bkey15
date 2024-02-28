@@ -14,14 +14,13 @@ library(DT)
 library(plotly)
 library(ggthemes)
 
-# handle common conflicts
+## handle common conflicts
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/akt_rec.rda"))
-load(here("data/recipes/appendices/basic_rec_5_alt2.rda"))
-load(here("data/recipes/appendices/basic_rec_10_alt2.rda"))
-load(here("data/recipes/appendices/basic_rec_20_alt2.rda"))
+load(here("data/recipes/appendices/rec_ma_imp_5.rda"))
+load(here("data/recipes/appendices/rec_ma_imp_10.rda"))
+load(here("data/recipes/appendices/rec_ma_imp_20.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -41,21 +40,16 @@ basic_spec <- linear_reg() |>
 ## wfl_set ----
 wfl_set <- workflow_set(
   preproc = list(
-    neighbors_5 = basic_rec_5_alt2,
-    neighbors_10 = basic_rec_10_alt2,
-    neighbors_20 = basic_rec_20_alt2
-    ),
+    neighbors_5 = rec_ma_imp_5,
+    neighbors_10 = rec_ma_imp_10,
+    neighbors_20 = rec_ma_imp_20
+  ),
   models = list(
     null = null_spec,
     lm = basic_spec
   ),
   cross = TRUE
 )
-
-## avg_kill_tort ----
-akt_wflw <- workflow() |>  
-  add_model(basic_spec) |>  
-  add_recipe(akt_rec)
 
 # fit models ----
 ## register cores ----
@@ -65,15 +59,8 @@ registerDoMC(cores = 8)
 #### set seed ----
 set.seed(1226)
 
-### avg_kill_tort ----
-akt_fit <- akt_wflw |> 
-  fit_resamples(
-    resamples = train_folds, 
-    control = control_resamples(save_workflow = TRUE)
-  )
-
 #### remaining fits ----
-wfl_set_fits <- wfl_set |> 
+base_fits_ma <- wfl_set |> 
   workflow_map(
     "fit_resamples",
     seed = 1226,
@@ -84,12 +71,8 @@ wfl_set_fits <- wfl_set |>
     )
   )
 
-## combine fits ----
-base_fits_alt2 <- as_workflow_set(akt_lm = akt_fit) |> 
-  bind_rows(wfl_set_fits)
-
 ## save fits ----
-base_fits_alt2 |> 
+base_fits_ma |> 
   save(
-    file = here("data/results/fits_cv/baselines/appendices/base_fits_alt2.rda")
-    )
+    file = here("data/results/fits_cv/baselines/appendices/base_fits_ma.rda")
+  )

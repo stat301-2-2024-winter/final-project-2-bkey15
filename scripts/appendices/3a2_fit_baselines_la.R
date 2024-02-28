@@ -18,10 +18,9 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load recipes ----
-load(here("data/recipes/akt_rec.rda"))
-load(here("data/recipes/appendices/basic_rec_5_alt.rda"))
-load(here("data/recipes/appendices/basic_rec_10_alt.rda"))
-load(here("data/recipes/appendices/basic_rec_20_alt.rda"))
+load(here("data/recipes/appendices/rec_la_imp_5.rda"))
+load(here("data/recipes/appendices/rec_la_imp_10.rda"))
+load(here("data/recipes/appendices/rec_la_imp_20.rda"))
 
 # load folds ----
 load(here("data/splits/train_folds.rda"))
@@ -41,9 +40,9 @@ basic_spec <- linear_reg() |>
 ## wfl_set ----
 wfl_set <- workflow_set(
   preproc = list(
-    neighbors_5 = basic_rec_5_alt,
-    neighbors_10 = basic_rec_10_alt,
-    neighbors_20 = basic_rec_20_alt
+    neighbors_5 = rec_la_imp_5,
+    neighbors_10 = rec_la_imp_10,
+    neighbors_20 = rec_la_imp_20
     ),
   models = list(
     null = null_spec,
@@ -51,11 +50,6 @@ wfl_set <- workflow_set(
   ),
   cross = TRUE
 )
-
-## avg_kill_tort ----
-akt_wflw <- workflow() |>  
-  add_model(basic_spec) |>  
-  add_recipe(akt_rec)
 
 # fit models ----
 ## register cores ----
@@ -65,15 +59,8 @@ registerDoMC(cores = 8)
 #### set seed ----
 set.seed(1226)
 
-### avg_kill_tort ----
-akt_fit <- akt_wflw |> 
-  fit_resamples(
-    resamples = train_folds, 
-    control = control_resamples(save_workflow = TRUE)
-  )
-
 #### remaining fits ----
-wfl_set_fits <- wfl_set |> 
+base_fits_la <- wfl_set |> 
   workflow_map(
     "fit_resamples",
     seed = 1226,
@@ -84,12 +71,8 @@ wfl_set_fits <- wfl_set |>
     )
   )
 
-## combine fits ----
-base_fits_alt <- as_workflow_set(akt_lm = akt_fit) |> 
-  bind_rows(wfl_set_fits)
-
 ## save fits ----
-base_fits_alt |> 
+base_fits_la |> 
   save(
-    file = here("data/results/fits_cv/baselines/appendices/base_fits_alt.rda")
+    file = here("data/results/fits_cv/baselines/appendices/base_fits_la.rda")
     )

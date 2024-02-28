@@ -89,7 +89,7 @@ scatt_plot_pvi <- preproc_data |>
     x = "PVI (Unscaled)",
     y = "PVI (Scaled)",
     title = "Scatterplot: Physical Violence Indices, Scaled vs. Unscaled",
-    subtitle = "Is the strong relationship a cause for concern?",
+    subtitle = "The two are related through a logistic function",
     caption = "Source: V-Dem (2023)"
     ) +
   theme_solarized()

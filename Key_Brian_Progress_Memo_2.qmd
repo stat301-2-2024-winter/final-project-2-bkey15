@@ -49,7 +49,7 @@ In my previous memo, I failed to provide a visualization of the distribution of 
 
 The above shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features seem relatively minor, and most methods available to correct them do not apply given the nature of the variable.^[Namely, square-root, log, and Box-Cox transformations only work for positive variables, but approximately half of HR Scores' values are negative.]
 
-Below, however, is evidence that I have attempted a Yeo-Johnson transformation of HR scores:
+Below, however, is evidence that I have attempted a Yeo-Johnson transformation of HR Scores:
 
 ![](plots/appendices/yj_dist_plots.png)
 
@@ -91,7 +91,7 @@ The preprocessed dataset also exhibits a low degree of missingness, as demonstra
 
 I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds.
 
-## Recipes
+## Recipes {#sec-rec}
 
 My null (`null`) and basic baseline (`lm`) models---analyzed in @sec-base-fits---draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively. I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
 
@@ -106,7 +106,7 @@ This final step is important. As a factor, year can continue to be used as an im
 
 In aggregate, the preprocessing steps results in a training set of 226 variables: 1 outcome, 2 ID variables,^[`country_name` and `cow_year`] and 223 predictors---179 of which are country dummies.
 
-Also included as a baseline in @sec-base-fits is a fourth recipe (`akt_lm`), which simply avails itself of my unweighted Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Scores. I do so in order to test the appropriateness of merely substituting it for HR Scores.
+Also included as a baseline in @sec-base-fits is a fourth recipe (`akt_lm`), which simply avails itself of my unscaled Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Scores. I do so in order to test the appropriateness of merely substituting it for HR Scores.
 
 The ridge, lasso, and elastic-net models seen in @sec-tune-fits use the same recipe as that underpinning the 5-neighbor baselines.^[See @sec-base-fits, below, for a discussion as to why I proceed with the 5-neighbor recipe for the tuning fits.] The KNN, random forest, and boosted tree models---also appearing in @sec-tune-fits---rely on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.^[This means that the total number of predictors utilized by these models is 224---one more than that of the others.]
 
@@ -118,9 +118,9 @@ To summarize, the recipes I deploy and their apportionment to the models can be 
   -   20 Neighbors: basic baseline, null
 2.    Tree:
   -   5 Neighbors: KNN, random forest, boosted tree
-3.    Unweighted PVI
+3.    Unscaled PVI
 
-These amount to four recipes in total: three "main," one "tree," and one additional baseline (unweighted PVI).
+These amount to five recipes in total: three "main," one "tree," and one additional baseline (unscaled PVI).
 
 ## Baseline Fits {#sec-base-fits}
 
@@ -133,9 +133,9 @@ load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
 rmse_kbl_base_fits
 ```
 
-As we can see, the null models perform well-worse than the basic baseline models; the unweighted PVI baseline splits the difference between the two.
+As we can see, the null models perform well-worse than the basic baseline models; the unscaled PVI baseline splits the difference between the two.
 
-There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unweighted PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Score than to use the unweighted PVI as a simple substitute for HR Score. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger (or smaller) number with marginal impact on our findings.
+There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unscaled PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Scores than to use the unscaled PVI as a simple substitute for HR Scores. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger (or smaller) number with marginal impact on our findings.
 
 ## Tuned Fits {#sec-tune-fits}
 
@@ -168,7 +168,7 @@ load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned.rda"))
 rmse_kbl_best_tuned
 ```
 
-The optimal tuning parameters for these models as assessed by mean RMSE were, respectively:
+The optimal tuning parameters for these models as assessed by mean RMSE are, respectively:
 
 -   KNN: `neighbors = 2`
 -   Random Forest: `mtry = 14`, `min_n = 2`
@@ -202,9 +202,47 @@ To round off this discussion is the below scatterplot, which depicts the relatio
 
 ![](plots/scatt_plot_final_predicts.png)
 
-## Further Considerations and Remaining Questions
+## Remaining Considerations
 
-At this stage, I feel as though my final project is more or less complete. Aside from the issues I've already identified as (potentially) meriting feedback---namely, Yeo-Johnson transformation of the outcome (@sec-eda) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
+At this stage, I feel as though my final project is near to completion. Aside from the issues I've already identified as meriting potential feedback---namely, Yeo-Johnson transformation of the outcome (@sec-eda) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
+
+Needless to say, four of my five recipes are effectively "kitchen sink" in kind (the outlier being the unscaled PVI recipe). The V-Dem variables capture interrelated phenomena (e.g., elections and civil liberties) and occasionally comprise additive measures as well as their inputs (e.g., PVI and its components, the political killings and torture metrics). They also contain variants of the same variable set to different scales (e.g., the three-point, four-point, and five-point versions of the PVI). A particularly concerning example of this, to me, is the inclusion of both the unscaled PVI and original (unscaled) PVI, the latter simply being the former set to a 0-to-1 scale. The two are hence tightly related, namely through a logistic function, as demonstrated in the plot below:^[My work in this section can be found in `scripts/appendices/`.]
 
 ![](plots/scatt_plot_pvi.png)
 
+I opted to include all such variants, for I didn't want to presuppose that one would be "better" in predicting HR Scores than the other(s). I'm also of the understanding that multicollinearity may be less of a concern for prediction problems such as ours, where the primary objective is simply to produce the most accurate estimates possible---in contrast to inference problems, where robust coefficients and p-values are the gold standard. Nonetheless, I remain worried about the impact of multicollinearity on the strength of my predictions.
+
+To this end, I created and briefly tested two sets of new recipes from my original set of "main" recipes (@sec-rec), both of which are multicollinearity averse. The first is less averse, simply removing the scaled PVI^[`v2x_clphy`] as a predictor from each main recipe.^[I do, however, allow the scaled PVI to be present for the KNN-imputation step. This is also true for all other variable-variants in the more-averse set of recipes.] The second is more averse, removing not only said variable, but also all other variable-variants as predictors.^[These variables are, namely, the PVI Ordinal (`e_v2x_clphy *_3C, *_4C, *_5C`), the Equality before the Law and Individual Liberty Index Ordinal (`e_v2xcl_rol *_3C, *_4C, *_5C`), and the Civil Liberties Index Ordinal (`e_v2x_civlib *_3C, *_4C, *_5C`).]
+
+For now, I tested these recipes on the baseline models, exclusively. Therefore, the recipes I deployed and their apportionment to the models can be organized as follows:
+
+1.    Least Averse:
+  -   5 Neighbors: basic baseline, null
+  -   10 Neighbors: basic baseline, null
+  -   20 Neighbors: basic baseline, null
+2.    Most Averse:
+  -   5 Neighbors: basic baseline, null
+  -   10 Neighbors: basic baseline, null
+  -   20 Neighbors: basic baseline, null
+
+These amount to six recipes in total: three that are less multicollinearity averse, and three that are more multicollinearity averse.
+
+The performance of these fits on the cross-validation folds, as measured by mean RMSE, are given in @tbl-rmses-base-la and @tbl-rmses-base-ma, below:
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-base-la
+#| tbl-cap: "Least Averse - Comparison of Mean RMSEs by Model"
+load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_la.rda"))
+rmse_kbl_base_fits_la
+```
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-base-ma
+#| tbl-cap: "Most Averse - Comparison of Mean RMSEs by Model"
+load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_ma.rda"))
+rmse_kbl_base_fits_ma
+```
+
+The basic baseline (`*_lm`) results seemingly signify a deterioration in quality: vis-à-vis the metrics seen in @tbl-rmses-base, the models perform worse, with gradual yet consistent increases in both mean RMSE and standard error as they become more multicollinearity averse.
+
+If predictive accuracy is the chief objective, then these results suggest that I should not, in fact, proceed with the multicollinearity-averse recipes---irrespective of whether I ultimately use the values produced from my model for inferential tasks. Nevertheless, I am open to feedback that would confirm or challenge my interpretation of or decision-making around this topic.
