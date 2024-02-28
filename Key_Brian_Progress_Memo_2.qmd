@@ -93,7 +93,7 @@ I opted to split my data with proportions of 75-25 training/testing, 90-10 analy
 
 ## Recipes {#sec-rec}
 
-My null (`null`) and basic baseline (`lm`) models---analyzed in @sec-base-fits---draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively. I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
+My null (`null`) and basic baseline (`lm`) models---analyzed in @sec-base-fits---draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
 
 Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
 
