@@ -48,3 +48,10 @@
 ## 02/25/24 ##
 
 - Might have a multicollinearity issue with avg_kill_tort and v2x_clphy. Run the models again after removing the latter?
+
+## 02/29/24 ##
+
+- I've explored recipes that remove the variables at issue re: multicollinearity. They don't improve model performance. Research shows that multicollinearity probably isn't a huge issue for prediction (see that time series textbook I alwaus use).
+- For the final write-up, be sure to discuss the removal of cases where cowcode = 0 (even if we assigned these cases arbitrary cow codes such that they would be included in the cowcode predictor dummy, they don't appear in hr_scores, so there's no way to predict a relationship).
+- Thinking about whether lagging hr_scores would be interesting to test. Not sure, honestly. Maybe just test it on the baselines for now.
+
