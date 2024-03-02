@@ -75,12 +75,23 @@ hrsc_cv_pred_rmses <- hrsc_cv_pred_mets |>
   mutate(diff = arima_rmse - ets_rmse)
 
 #### locate best models ----
-ets_better <- hrsc_cv_pred_rmses |> 
+hrsc_ets_better <- hrsc_cv_pred_rmses |> 
   filter(diff > 0)
-arima_better <- hrsc_cv_pred_rmses |> 
+hrsc_arima_better <- hrsc_cv_pred_rmses |> 
   filter(diff < 0 | is.na(diff))
 empty_set_check <- hrsc_cv_pred_rmses |> 
   filter(diff == 0)
+
+##### save
+hrsc_ets_better |> 
+  save(
+    file = here("data/results/post-assess/cv/hrsc_ets_better.rda")
+    )
+
+hrsc_arima_better |> 
+  save(
+    file = here("data/results/post-assess/cv/hrsc_arima_better.rda")
+    )
 
 #### compute proportion of cow_years for each cow in the preproc dataset ----
 cow_prop <- preproc_data |> 
@@ -90,19 +101,33 @@ cow_prop <- preproc_data |>
     )
 
 #### create weighted average for rmse of each best model ----
-arima_better <- arima_better |> 
+hrsc_arima_better <- hrsc_arima_better |> 
   left_join(cow_prop) |> 
   mutate(
     wt_arima_rmse = arima_rmse*prop
     )
-ets_better <- ets_better |> 
+hrsc_ets_better <- hrsc_ets_better |> 
   left_join(cow_prop) |> 
   mutate(
     wt_ets_rmse = ets_rmse*prop
     )
 
 #### sum weighted averages ----
-sum(arima_better$wt_arima_rmse) + sum(ets_better$wt_ets_rmse)
+sum(hrsc_arima_better$wt_arima_rmse) + sum(hrsc_ets_better$wt_ets_rmse)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## gdp ----
 registerDoMC(cores = 8)

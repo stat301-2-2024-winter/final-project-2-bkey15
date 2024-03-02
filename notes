@@ -55,3 +55,6 @@
 - For the final write-up, be sure to discuss the removal of cases where cowcode = 0 (even if we assigned these cases arbitrary cow codes such that they would be included in the cowcode predictor dummy, they don't appear in hr_scores, so there's no way to predict a relationship).
 - Thinking about whether lagging hr_scores would be interesting to test. Not sure, honestly. Maybe just test it on the baselines for now.
 
+## 03/02/24 ##
+
+- cow_code 345 is Yugoslavia in cow_codes and hr_scores, but Serbia in vdem.
