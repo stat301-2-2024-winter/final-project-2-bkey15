@@ -1,5 +1,6 @@
 # Final Project ----
-# Preprocess to make predictions on missing data
+# Preprocess to make predictions on missing data (hr_scores, pop, gdp, gdppc)
+# Seed set for KNN imputation
 
 # load packages ----
 library(tidyverse)
@@ -19,198 +20,53 @@ library(tsibble)
 tidymodels_prefer()
 
 # load data ----
-## vdem ----
-vdem <- vdem |> 
-  filter(year > 1945)
+load(here("data/preprocessed/preproc_data.rda"))
 
-## hr_scores ----
-hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
-
-## pts ----
-load(here("data/raw/PTS-2023.RData"))
-
-## cow_codes ----
-cow_codes <- read_csv("data/raw/COW-country-codes.csv")
-
-# merge data ----
-## prep merge
-### vdem ----
-vdem <- vdem |> 
-  mutate(
-    COWcode = if_else(COWcode == 315, 316, COWcode)
+# impute missing data (KNN, neighbors = 5)
+## create preprocessing recipe ----
+ts_imp_rec <- preproc_data |> 
+  recipe(hr_score ~ .) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(cow_year, new_role = "id variable") |> 
+  step_mutate(
+    cowcode = factor(cowcode),
+    year = factor(year),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
+  ) |> 
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_numeric_predictors()) |> 
+  step_impute_knn(all_predictors()) |> 
+  step_rm(
+    starts_with("year"),
+    starts_with("cowcode")
   )
 
-### hr_scores ----
-hr_scores <- hr_scores |> 
-  select(YEAR, COW, theta_mean) |>
-  rename(
-    year = YEAR,
-    COWcode = COW,
-    hr_score = theta_mean
-    )
+## bake recipe
+set.seed(1226)
+ts_preproc <- ts_imp_rec |> 
+  prep() |> 
+  bake(new_data = NULL)
 
-### pts ----
-### BDK: difference with original is removing filter(year < 2020) argument
-pts <- PTS_2023 |> 
-  select(Year, COW_Code_N, PTS_A, PTS_H, PTS_S) |> 
-  rename(
-    year = Year,
-    cowcode = COW_Code_N
-    ) |> 
-  mutate(
-    cow_year = paste(
-      cowcode, year, sep = "-"
-      )
-    ) |> 
-  filter(
-    !duplicated(cow_year)
-    )
-
-### cow_codes ----
-cow_codes <- cow_codes |> 
-  select(-StateAbb) |> 
-  rename(
-    cowcode = CCode,
-    country_name_cow = StateNme
-  ) |> 
-  filter(
-    !duplicated(cowcode)
-  )
-
-## complete merge ----
-### vdem & hr_scores ----
-### BDK: note - difference with original is left_join instead of right_join, and removal of duplicates. Note that left_join eliminates the small states, because they appear in hr_scores but not in vdem
-preproc_data <- left_join(vdem, hr_scores) |> 
-  rename(
-    cowcode = COWcode
-  ) |> 
-  mutate(
-    cow_year = paste(
-      cowcode, year, sep = "-"
-    )
-  ) |> 
+## create tsibble object
+ts_preproc <- preproc_data |> 
+  select(cowcode, year, cow_year) |> 
+  left_join(ts_preproc) |> 
   relocate(
-    cowcode, year, cow_year, hr_score
-  ) |> 
-  filter(
-    !is.na(cowcode)
-  )
-
-### merge preproc & pts ----
-preproc_data <- left_join(preproc_data, pts)
-
-### merge preproc & cow_codes ----
-preproc_data <- left_join(preproc_data, cow_codes) |> 
-  relocate(
-    country_name_cow,
+    hr_score,
     .after = country_name
-    )
-
-## create avg_kill_tort ----
-preproc_data <- preproc_data |> 
-  mutate(
-  avg_kill_tort = (v2clkill + v2cltort)/2
-  ) |> 
-  relocate(
-    avg_kill_tort,
-    .after = hr_score
-    )
-
-## select needed vars only ----
-preproc_pa_init <- preproc_data |> 
-  select(
-    cowcode,
-    year,
-    cow_year,
-    country_name_cow,
-    hr_score,
-    avg_kill_tort,
-    v2x_clphy,
-    e_v2x_clphy_3C,
-    e_v2x_clphy_4C,
-    e_v2x_clphy_5C,
-    v2clkill,
-    v2cltort,
-    v2xcl_rol,
-    e_v2xcl_rol_3C,
-    e_v2xcl_rol_4C,
-    e_v2xcl_rol_5C,
-    v2x_civlib,
-    e_v2x_civlib_3C,
-    e_v2x_civlib_4C,
-    e_v2x_civlib_5C,
-    v2caviol,
-    v2x_polyarchy,
-    v2x_libdem,
-    v2x_partipdem,
-    v2x_delibdem,
-    v2x_egaldem,
-    v2x_api,
-    v2x_mpi,
-    v2x_freexp_altinf,
-    v2x_frassoc_thick,
-    v2x_suffr,
-    v2xel_frefair,
-    v2x_elecoff,
-    v2x_liberal,
-    v2x_jucon,
-    v2xlg_legcon,
-    v2x_partip,
-    v2x_cspart,
-    v2xdd_dd,
-    v2xel_locelec,
-    v2xel_regelec,
-    v2xdl_delib,
-    v2x_egal,
-    v2xeg_eqprotec,
-    v2xeg_eqaccess,
-    v2xeg_eqdr,
-    e_pop,
-    e_gdp,
-    e_gdppc,
-    PTS_A,
-    PTS_H,
-    PTS_S
     ) |> 
-  rename(
-    country_name = country_name_cow
-    )
-
-duplicate_check <- preproc_pa_init |> 
-  filter(
-    duplicated(cow_year)
-    )
-
-preproc_pa_init |> 
-  save(
-  file = here("data/preprocessed/post-assess/preproc_pa_init.rda")
-  )
-
-# initial missingness check ----
-gg_miss_var(preproc_data_pa)
-
-# BDK: we have significant missingness in the economic statistics (specific to more recent years), so let's try to impute these with time series forecasting
-
-# time series imputation (e_pop, e_gdp, e_gdppc) ----
-## create tsibble object ----
-ts_preproc <- preproc_pa_init |>
-  select(
-    cowcode,
-    year,
-    country_name,
-    hr_score,
-    e_pop,
-    e_gdp,
-    e_gdppc
-    ) |> 
-  filter(year < 2020) |> 
   as_tsibble(
-    index = year,
-    key = cowcode
+    index = "year",
+    key = "cowcode"
     )
 
-### save ----
+## save ts_preproc
 ts_preproc |> 
   save(
     file = here("data/preprocessed/post-assess/ts_preproc.rda")
-  )
+    )
