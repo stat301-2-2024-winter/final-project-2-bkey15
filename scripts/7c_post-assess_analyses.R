@@ -1,5 +1,5 @@
 # Final Project ----
-# Find best models, compute mean RMSEs, store predictions
+# Find best models, compute mean RMSEs
 
 # load packages ----
 library(tidyverse)
@@ -23,6 +23,8 @@ load(here("data/preprocessed/preproc_data.rda"))
 load(here("data/preprocessed/post-assess/ts_preproc.rda"))
 load(here("data/results/post-assess/cv/hrsc_cv_preds.rda"))
 load(here("data/results/post-assess/cv/log_pop_cv_preds.rda"))
+load(here("data/results/post-assess/cv/log_gdp_cv_preds.rda"))
+load(here("data/results/post-assess/cv/log_gdppc_cv_preds.rda"))
 
 # compute proportion of cow_years for each cow in the preproc dataset ----
 cow_prop <- preproc_data |> 
@@ -145,4 +147,116 @@ log_pop_arima_better |>
     file = here("data/results/post-assess/cv/log_pop_arima_better.rda")
   )
 
-# log10_e_pop ----
+# log10_e_gdp ----
+## store prediction metrics ----
+log_gdp_cv_pred_mets <- log_gdp_cv_preds |> 
+  fabletools::accuracy(ts_preproc)
+
+## compute rmse diffs ----
+log_gdp_cv_pred_rmses <- log_gdp_cv_pred_mets |> 
+  select(.model, cowcode, RMSE) |> 
+  pivot_wider(
+    names_from = .model,
+    values_from = RMSE
+  ) |> 
+  rename(
+    arima_rmse = "ARIMA(log10_e_gdp)",
+    ets_rmse = "ETS(log10_e_gdp)"
+  ) |> 
+  mutate(diff = arima_rmse - ets_rmse)
+
+## locate best models ----
+log_gdp_ets_better <- log_gdp_cv_pred_rmses |> 
+  filter(diff > 0)
+log_gdp_arima_better <- log_gdp_cv_pred_rmses |> 
+  filter(diff < 0 | is.na(diff))
+empty_set_check <- log_gdp_cv_pred_rmses |> 
+  filter(diff == 0)
+
+## create weighted average for rmse of each best model ----
+log_gdp_arima_better <- log_gdp_arima_better |> 
+  left_join(cow_prop) |> 
+  mutate(
+    wt_arima_rmse = arima_rmse*prop
+  )
+log_gdp_ets_better <- log_gdp_ets_better |> 
+  left_join(cow_prop) |> 
+  mutate(
+    wt_ets_rmse = ets_rmse*prop
+  )
+
+## sum weighted averages ----
+sum(log_gdp_arima_better$wt_arima_rmse) + sum(log_gdp_ets_better$wt_ets_rmse)
+
+## save results ----
+log_gdp_cv_pred_mets |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdp_cv_pred_mets.rda")
+  )
+
+log_gdp_ets_better |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdp_ets_better.rda")
+  )
+
+log_gdp_arima_better |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdp_arima_better.rda")
+  )
+
+# log10_e_gdppc ----
+## store prediction metrics ----
+log_gdppc_cv_pred_mets <- log_gdppc_cv_preds |> 
+  fabletools::accuracy(ts_preproc)
+
+## compute rmse diffs ----
+log_gdppc_cv_pred_rmses <- log_gdppc_cv_pred_mets |> 
+  select(.model, cowcode, RMSE) |> 
+  pivot_wider(
+    names_from = .model,
+    values_from = RMSE
+  ) |> 
+  rename(
+    arima_rmse = "ARIMA(log10_e_gdppc)",
+    ets_rmse = "ETS(log10_e_gdppc)"
+  ) |> 
+  mutate(diff = arima_rmse - ets_rmse)
+
+## locate best models ----
+log_gdppc_ets_better <- log_gdppc_cv_pred_rmses |> 
+  filter(diff > 0)
+log_gdppc_arima_better <- log_gdppc_cv_pred_rmses |> 
+  filter(diff < 0 | is.na(diff))
+empty_set_check <- log_gdppc_cv_pred_rmses |> 
+  filter(diff == 0)
+
+## create weighted average for rmse of each best model ----
+log_gdppc_arima_better <- log_gdppc_arima_better |> 
+  left_join(cow_prop) |> 
+  mutate(
+    wt_arima_rmse = arima_rmse*prop
+  )
+log_gdppc_ets_better <- log_gdppc_ets_better |> 
+  left_join(cow_prop) |> 
+  mutate(
+    wt_ets_rmse = ets_rmse*prop
+  )
+
+## sum weighted averages ----
+sum(log_gdppc_arima_better$wt_arima_rmse) + sum(log_gdppc_ets_better$wt_ets_rmse)
+
+## save results ----
+log_gdppc_cv_pred_mets |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdppc_cv_pred_mets.rda")
+  )
+
+log_gdppc_ets_better |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdppc_ets_better.rda")
+  )
+
+log_gdppc_arima_better |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdppc_arima_better.rda")
+  )

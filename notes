@@ -58,3 +58,10 @@
 ## 03/02/24 ##
 
 - cow_code 345 is Yugoslavia in cow_codes and hr_scores, but Serbia in vdem.
+
+## 03/03/24 ##
+
+- In step_normalize, each value (z_{i}) is calculated by the formula: (x_{i} - xbar)/s
+- I have stored xbar and s for log10_e_* pop, gdp, and gdppc in the post-assessment preprocessing phase. See that script. Will use this formula to de-normalize predictions.
+- Specifically, we can solve for the original value (x_{i}) by: z*s + xbar
+- Only 4 values for these variables are being imputed using prep-bake w/ KNN imputation (3 Bhutan + 1 diff case); note this as to why it's probably unnecessary to conduct further sets of imputations.

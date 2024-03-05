@@ -100,28 +100,28 @@ log_gdp_cv_preds |>
     file = here("data/results/post-assess/cv/log_gdp_cv_preds.rda")
     )
 
-### evaluate ----
-load(here("data/results/post-assess/cv/gdp_cv_pred_mets.rda"))
+## log10_e_gdppc ----
+registerDoMC(cores = 8)
 
-gdp_cv_pred_rmses <- gdp_cv_pred_mets |> 
-  select(.model, cowcode, RMSE) |> 
-  pivot_wider(
-    names_from = .model,
-    values_from = RMSE
-    ) |> 
-  rename(
-    arima_rmse = "ARIMA(e_gdp)",
-    ets_rmse = "ETS(e_gdp)"
-    ) |> 
-  mutate(diff = arima_rmse - ets_rmse)
+### cross-validate ----
+log_gdppc_cv <- ts_preproc |> 
+  stretch_tsibble(.init = 1) |>
+  model(
+    ETS(log10_e_gdppc),
+    ARIMA(log10_e_gdppc)
+  )
 
-ets_better <- gdp_cv_pred_rmses |> 
-  filter(diff > 0)
+### make cv predictions ----
+log_gdppc_cv_preds <- log_gdppc_cv |> 
+  forecast(h = 1)
 
-arima_better <- gdp_cv_pred_rmses |> 
-  filter(diff < 0 | is.na(diff))
+### save results ----
+log_gdppc_cv |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdppc_cv.rda")
+  )
 
-empty_set_check <- gdp_cv_pred_rmses |> 
-  filter(diff == 0)
-
-
+log_gdppc_cv_preds |> 
+  save(
+    file = here("data/results/post-assess/cv/log_gdppc_cv_preds.rda")
+  )
