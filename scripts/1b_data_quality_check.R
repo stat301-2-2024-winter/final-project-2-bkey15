@@ -20,14 +20,6 @@ tidymodels_prefer()
 hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 load(here("data/preprocessed/preproc_data.rda"))
 
-library(corrplot)
-load(here("data/splits/train.rda"))
-tmwr_cols <- colorRampPalette(c("#91CBD765", "#CA225E"))
-train |> 
-  select(-c(cowcode, country_name, year, cow_year, PTS_A, PTS_H, PTS_S)) |> 
-  cor(use = "pairwise.complete.obs") |> 
-  corrplot(col = tmwr_cols(200), tl.col = "black", method = "ellipse")
-
 # viz. hr_scores ----
 ## OG obs ----
 ### density plot ----
