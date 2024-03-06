@@ -54,9 +54,32 @@ rec_fe_main1 <- train |>
 #### check correlations ----
 tmwr_cols <- colorRampPalette(c("#91CBD765", "#CA225E"))
 train |> 
-  select(-c(cowcode, country_name, year, cow_year, PTS_A, PTS_H, PTS_S)) |> 
+  mutate(
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
+    ) |> 
+  select(
+    -c(
+      cowcode,
+      country_name,
+      year,
+      e_pop,
+      e_gdp,
+      e_gdppc,
+      cow_year,
+      PTS_A,
+      PTS_H,
+      PTS_S
+      )
+    ) |> 
   cor(use = "pairwise.complete.obs") |> 
-  corrplot(col = tmwr_cols(200), tl.col = "black", method = "ellipse")
+  corrplot(
+    col = tmwr_cols(200),
+    tl.col = "black",
+    method = "ellipse"
+    ) +
+  theme_solarized()
 
 cor(train$hr_score, train$v2x_clphy)
 cor(train$hr_score, train$avg_kill_tort)

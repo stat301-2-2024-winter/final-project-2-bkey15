@@ -39,8 +39,8 @@ rf_wfl <- workflow() |>
 
 # hyperparameter tuning values ----
 ## find mtry val as per rule of thumb ----
-## BDK: when we bake the tree recipe, we get 226 predictors (+ 1 outcome). See 2b_recipes_main.R
-sqrt(226)
+## BDK: when we bake the tree recipe, we get 224 predictors (+ 1 outcome & 2 ids). See 2b_recipes_kc.R
+sqrt(224)
 
 ## update ----
 rf_params <- parameters(rf_spec) |>  

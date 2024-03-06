@@ -1,0 +1,247 @@
+---
+title: "Final Project: A Model to Estimate HR Scores (2020-)"
+subtitle: |
+  | Data Science 2 with R (STAT 301-2)
+author: "Brian Key"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    theme:
+      dark: darkly
+
+number-sections: true
+
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+
+```{r, echo = FALSE}
+#| label: load-pkgs
+#| code-fold: false
+
+library(tidyverse)
+library(DT)
+library(here)
+```
+
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+
+[Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
+
+:::
+
+## EDA of Target Variable {#sec-eda}
+
+In my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
+
+![](plots/hr_score_OG_dist_plots.png)
+
+The above shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features seem relatively minor, and most methods available to correct them do not apply given the nature of the variable.^[Namely, square-root, log, and Box-Cox transformations only work for positive variables, but approximately half of HR Scores' values are negative.]
+
+Below, however, is evidence that I have attempted a Yeo-Johnson transformation of HR Scores:
+
+![](plots/appendices/yj_dist_plots.png)
+
+The transformation does rectify the right-skew, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature. In tandem with my present inability to compute the transformed variable's inverse subsequent to model fitting, these considerations prompt me to proceed with HR Scores unaltered, though I welcome feedback as to whether this is the right step to take.
+
+## Pre-Recipe Preprocessing {#sec-preproc}
+
+Prior to writing my recipes, I complete the following noteworthy preprocessing steps:
+
+-   Merge the V-Dem, HR Scores, and Political Terror Scale (PTS) datasets. At the outset, I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.
+-   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this justifiable on two counts:
+    1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
+    2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
+-   Remove country-years that appear in HR Scores but are systematically absent in V-Dem---cases where the value on "N Missing" is positive as shown in @tbl-vdem-miss, below:
+
+
+```{r, echo = FALSE}
+#| label: tbl-vdem-miss
+#| tbl-cap: "N Missing from V-Dem by Country"
+load(here("data/preprocessed/dattbl_vdem_miss.rda"))
+dattbl_vdem_miss
+```
+
+-   These observations mainly involve:
+    1. Post-Soviet states (e.g., Armenia, Azerbaijan, etc.) and post-WWII states (e.g., West and East Germany).
+    2. European microstates (e.g., Liechtenstein and Monaco) and small island states (e.g., Samoa, St. Vincent and the Grenadines, etc.).
+-   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my projections, though I again welcome feedback as to whether I've made the right choice.
+-   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
+
+Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:^[Admittedly, the distribution might be marginally more right-skewed; this likely owes itself to the removal of the European microstates, whose human rights levels are generally very high.]
+
+![](plots/hr_score_dist_plots.png)
+
+The preprocessed dataset also exhibits a low degree of missingness, as demonstrated by the plot below, meaning that the computational demands for our imputations should be rather low in turn:
+
+![](plots/preproc_miss_plot.png)
+
+## Data Splitting Specifications
+
+I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds.
+
+## Recipes {#sec-rec}
+
+My null (`null`) and basic baseline (`lm`) models---analyzed in @sec-base-fits---draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
+
+Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
+
+-   Transforming country ID (`cowcode`) and year to a dummy variable.
+-   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset. For evidence that I have verified this, see `scripts/appendices/0_appendices.R`.]
+-   Normalizing all numeric predictors.
+-   Removing the year dummies subsequent to KNN-imputation.
+
+This final step is important. As a factor, year can continue to be used as an imputation predictor for V-Dem observations, because there will almost certainly be V-Dem data for future years;^[The 2024 V-Dem Dataset, which will provide data up to 2023, is scheduled to be released on 07 March 2024.] yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, because year is a factor, there is no way to estimate the relationship between "2023," "2024," etc. and HR Scores when there exists wholesale missingness of HR Scores for those years.]
+
+In aggregate, the preprocessing steps results in a training set of 226 variables: 1 outcome, 2 ID variables,^[`country_name` and `cow_year`] and 223 predictors---179 of which are country dummies.
+
+Also included as a baseline in @sec-base-fits is a fourth recipe (`akt_lm`), which simply avails itself of my unscaled Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Scores. I do so in order to test the appropriateness of merely substituting it for HR Scores.
+
+The ridge, lasso, and elastic-net models seen in @sec-tune-fits use the same recipe as that underpinning the 5-neighbor baselines.^[See @sec-base-fits, below, for a discussion as to why I proceed with the 5-neighbor recipe for the tuning fits.] The KNN, random forest, and boosted tree models---also appearing in @sec-tune-fits---rely on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.^[This means that the total number of predictors utilized by these models is 224---one more than that of the others.]
+
+To summarize, the recipes I deploy and their apportionment to the models can be organized as follows:
+
+1.    Main:
+  -   5 Neighbors: basic baseline, null, ridge, lasso, elastic net
+  -   10 Neighbors: basic baseline, null
+  -   20 Neighbors: basic baseline, null
+2.    Tree:
+  -   5 Neighbors: KNN, random forest, boosted tree
+3.    Unscaled PVI
+
+These amount to five recipes in total: three "main," one "tree," and one additional baseline (unscaled PVI).
+
+## Baseline Fits {#sec-base-fits}
+
+@tbl-rmses-base, below, gives the performance of my baseline fits on the cross-validation folds as measured by mean RMSE:
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-base
+#| tbl-cap: "Comparison of Mean RMSEs by Model"
+load(here("data/results/fits_cv/baselines/rmse_kbl_base_fits.rda"))
+rmse_kbl_base_fits
+```
+
+As we can see, the null models perform well-worse than the basic baseline models; the unscaled PVI baseline splits the difference between the two.
+
+There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unscaled PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Scores than to use the unscaled PVI as a simple substitute for HR Scores. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger (or smaller) number with marginal impact on our findings.
+
+## Tuned Fits {#sec-tune-fits}
+
+I subsequently tune the following hyperparameters for six models on the cross-validation folds:
+
+1.    Ridge: `penalty`
+2.    Lasso: `penalty`
+3.    Elastic Net: `penalty` and `mixture`
+4.    KNN: `neighbors`
+5.    Random Forest: `mtry` and `min_n`
+6.    Boosted Tree: `mtry`, `min_n`, and `learn_rate`
+
+For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`. The random forest model further uses `trees = 1000` and an `mtry` range set to `c(1, 14)`, whereas the boosted tree model uses the same `mtry` range and a `learn_rate` range set to `c(-5, -0.2)`.
+
+The processing times for these models, with parallel processing across eight cores where possible, were approximately as follows:^[I simply timed these with my computer's clock.]
+
+1.    Ridge: 5 minutes
+2.    Lasso: 4 minutes
+3.    Elastic Net: 9 minutes
+4.    KNN: 12 minutes
+5.    Random Forest: 92 minutes
+6.    Boosted Tree: 65 minutes
+
+Below is @tbl-rmses-tune, which gives the best mean RMSE of each tuned fit:
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-tune
+#| tbl-cap: "Comparison of Best Mean RMSEs by Model"
+load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned1.rda"))
+rmse_kbl_best_tuned1
+```
+
+The optimal tuning parameters for these models as assessed by mean RMSE are, respectively:
+
+-   KNN: `neighbors = 2`
+-   Random Forest: `mtry = 14`, `min_n = 2`
+-   Boosted Tree: `mtry = 14`, `min_n = 2`, `learn_rate = 0.631`
+-   Elastic Net: `penalty = 1e-10`, `mixture = 0.683`
+-   Lasso: `penalty = 1e-10`
+-   Ridge: `penalty = 1e-10`
+
+Below is also a plot depicting the confidence intervals for each estimate:
+
+![](plots/ci_plot_best_tuned1.png)
+
+@tbl-rmses-tune and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
+
+## Final Fit
+
+@tbl-metrics-final, below, gives the performance metrics for the final fit applied to the testing set:
+
+```{r}
+#| label: tbl-metrics-final
+#| tbl-cap: "Performance Metrics from Final Fit"
+load(here("data/results/final/final_perform_stats_kbl.rda"))
+final_perform_stats_kbl
+```
+
+The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.975, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 51.2\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
+
+The RMSE of approximately 0.227 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed (approximately) by $0.227*2$.] then, represents only about `r round(((0.2271517*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.227 does not seem to mean much either. Indeed, the examples of countries that experienced such a score change did not witness, to my knowledge, any appreciable changes in their underlying political milieus.^[For these examples, see `scripts/appendices/0_appendices.R`.]
+
+To round off this discussion is the below scatterplot, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
+
+![](plots/scatt_plot_final_predicts.png)
+
+## Remaining Considerations
+
+At this stage, I feel as though my final project is near to completion. Aside from the issues I've already identified as meriting potential feedback---namely, Yeo-Johnson transformation of the outcome (@sec-eda) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
+
+Needless to say, four of my five recipes are effectively "kitchen sink" in kind (the outlier being the unscaled PVI recipe). The V-Dem variables capture interrelated phenomena (e.g., elections and civil liberties) and occasionally comprise additive measures as well as their inputs (e.g., PVI and its components, the political killings and torture metrics). They also contain variants of the same variable set to different scales (e.g., the three-point, four-point, and five-point versions of the PVI). A particularly concerning example of this, to me, is the inclusion of both the unscaled PVI and original (unscaled) PVI, the latter simply being the former set to a 0-to-1 scale. The two are hence tightly related, namely through a logistic function, as demonstrated in the plot below:^[My work in this section can be found in `scripts/appendices/`.]
+
+![](plots/scatt_plot_pvi.png)
+
+I opted to include all such variants, for I didn't want to presuppose that one would be "better" in predicting HR Scores than the other(s). I'm also of the understanding that multicollinearity may be less of a concern for prediction problems such as ours, where the primary objective is simply to produce the most accurate estimates possible---in contrast to inference problems, where robust coefficients and p-values are the gold standard. Nonetheless, I remain worried about the impact of multicollinearity on the strength of my predictions.
+
+To this end, I created and briefly tested two sets of new recipes from my original set of "main" recipes (@sec-rec), both of which are multicollinearity averse. The first is less averse, simply removing the scaled PVI^[`v2x_clphy`] as a predictor from each main recipe.^[I do, however, allow the scaled PVI to be present for the KNN-imputation step. This is also true for all other variable-variants in the more-averse set of recipes.] The second is more averse, removing not only said variable, but also all other variable-variants as predictors.^[These variables are, namely, the PVI Ordinal (`e_v2x_clphy *_3C, *_4C, *_5C`), the Equality before the Law and Individual Liberty Index Ordinal (`e_v2xcl_rol *_3C, *_4C, *_5C`), and the Civil Liberties Index Ordinal (`e_v2x_civlib *_3C, *_4C, *_5C`).]
+
+For now, I tested these recipes on the baseline models, exclusively. Therefore, the recipes I deployed and their apportionment to the models can be organized as follows:
+
+1.    Least Averse:
+  -   5 Neighbors: basic baseline, null
+  -   10 Neighbors: basic baseline, null
+  -   20 Neighbors: basic baseline, null
+2.    Most Averse:
+  -   5 Neighbors: basic baseline, null
+  -   10 Neighbors: basic baseline, null
+  -   20 Neighbors: basic baseline, null
+
+These amount to six recipes in total: three that are less multicollinearity averse, and three that are more multicollinearity averse.
+
+The performance of these fits on the cross-validation folds, as measured by mean RMSE, are given in @tbl-rmses-base-la and @tbl-rmses-base-ma, below:
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-base-la
+#| tbl-cap: "Least Averse - Comparison of Mean RMSEs by Model"
+load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_la.rda"))
+rmse_kbl_base_fits_la
+```
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-base-ma
+#| tbl-cap: "Most Averse - Comparison of Mean RMSEs by Model"
+load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_ma.rda"))
+rmse_kbl_base_fits_ma
+```
+
+The basic baseline (`*_lm`) results seemingly signify a deterioration in quality: vis-à-vis the metrics seen in @tbl-rmses-base, the models perform worse, with gradual yet consistent increases in both mean RMSE and standard error as they become more multicollinearity averse.
+
+If predictive accuracy is the chief objective, then these results suggest that I should not, in fact, proceed with the multicollinearity-averse recipes---irrespective of whether I ultimately use the values produced from my model for inferential tasks. Nevertheless, I am open to feedback that would confirm or challenge my interpretation of or decision-making around this topic.

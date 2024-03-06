@@ -39,7 +39,7 @@ bt_wfl <- workflow() |>
 
 # hyperparameter tuning values ----
 ## find mtry val as per rule of thumb ----
-sqrt(226)
+sqrt(212)
 
 ## update ----
 bt_params <- parameters(bt_spec) |>  
