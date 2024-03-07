@@ -223,7 +223,8 @@ preproc_miss_plot <- preproc_data |>
     ) |> 
   gg_miss_var() +
   labs(
-    title = "Plot: Missing Observations by Predictor in the Preprocessed Dataset",
+    title = "Plot: Missing Observations by Predictor",
+    subtitle = "Values from the Preprocessed Dataset",
     caption = "Source: V-Dem (2024)"
     ) +
   theme_solarized()
