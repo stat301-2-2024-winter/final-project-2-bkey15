@@ -65,3 +65,10 @@
 - I have stored xbar and s for log10_e_* pop, gdp, and gdppc in the post-assessment preprocessing phase. See that script. Will use this formula to de-normalize predictions.
 - Specifically, we can solve for the original value (x_{i}) by: z*s + xbar
 - Only 4 values for these variables are being imputed using prep-bake w/ KNN imputation (3 Bhutan + 1 diff case); note this as to why it's probably unnecessary to conduct further sets of imputations.
+
+## 03/07/24 ##
+
+-For new "most-averse" feature-engineering recipes, I've removed:
+  1. The high-level indices, as these are all comprised of the mid-level indices.
+  2. avg_kill_tort & v2x_egal, because they're simple averages of other indicators. (Some of the other mid-level indices are averages, but they're weighted or contain other rules that render them "complex.")
+  3. v2x_suffr & log10_e_gdp, because both have low-correlations with hr_score. (The former is a measure of de jure, not de facto, suffrage; the latter is perhaps only related to hr_score through population, which is negatively correlated with hr_score since the world's largest countries happen to have low HR scores.)
