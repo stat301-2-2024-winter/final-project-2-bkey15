@@ -50,7 +50,7 @@ rec_fe_main1 <- train |>
   step_zv(all_predictors()) |> 
   step_normalize(all_numeric_predictors())
 
-### main2 (interactions + removal of multicollinear/low corr vars) ----
+### main2 (interactions + removal of multicollinear/low corr vars, avg_kill_tort, v2x_egal, & high-level indices) ----
 #### check correlations ----
 tmwr_cols <- colorRampPalette(c("#91CBD765", "#CA225E"))
 train |> 
@@ -104,6 +104,12 @@ rec_fe_main2 <- train |>
   ) |> 
   step_rm(
     starts_with("year"),
+    avg_kill_tort,
+    v2x_polyarchy,
+    v2x_libdem,
+    v2x_partipdem,
+    v2x_delibdem,
+    v2x_egaldem,
     v2x_clphy,
     e_v2x_clphy_3C,
     e_v2x_clphy_4C,
@@ -115,9 +121,9 @@ rec_fe_main2 <- train |>
     e_v2x_civlib_4C,
     e_v2x_civlib_5C,
     v2x_suffr,
+    v2x_egal,
     log10_e_gdp
   ) |> 
-  step_interact(terms = ~ log10_e_gdppc:v2x_egal) |> 
   step_interact(terms = ~ log10_e_gdppc:starts_with("v2xeg")) |> 
   step_zv(all_predictors()) |> 
   step_normalize(all_numeric_predictors())
@@ -145,6 +151,12 @@ rec_fe_tree <- train |>
   ) |> 
   step_rm(
     starts_with("year"),
+    avg_kill_tort,
+    v2x_polyarchy,
+    v2x_libdem,
+    v2x_partipdem,
+    v2x_delibdem,
+    v2x_egaldem,
     v2x_clphy,
     e_v2x_clphy_3C,
     e_v2x_clphy_4C,
@@ -156,6 +168,7 @@ rec_fe_tree <- train |>
     e_v2x_civlib_4C,
     e_v2x_civlib_5C,
     v2x_suffr,
+    v2x_egal,
     log10_e_gdp
   ) |> 
   step_zv(all_predictors()) |> 
