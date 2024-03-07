@@ -1,5 +1,5 @@
 # Final Project ----
-# Model selection/comparison & analysis
+# Model selection/comparison & analysis - minimal fe
 
 # load packages ----
 library(tidyverse)

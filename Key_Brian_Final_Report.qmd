@@ -147,7 +147,7 @@ I subsequently tune the following hyperparameters for six models on the cross-va
 5.    Random Forest: `mtry` and `min_n`
 6.    Boosted Tree: `mtry`, `min_n`, and `learn_rate`
 
-For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`. The random forest model further uses `trees = 1000` and an `mtry` range set to `c(1, 14)`, whereas the boosted tree model uses the same `mtry` range and a `learn_rate` range set to `c(-5, -0.2)`.
+For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`. The random forest model further uses `trees = 1000` and an `mtry` range set to `c(1, 15)`, whereas the boosted tree model uses the same `mtry` range and a `learn_rate` range set to `c(-3, -0.2)`.
 
 The processing times for these models, with parallel processing across eight cores where possible, were approximately as follows:^[I simply timed these with my computer's clock.]
 
@@ -179,6 +179,15 @@ The optimal tuning parameters for these models as assessed by mean RMSE are, res
 Below is also a plot depicting the confidence intervals for each estimate:
 
 ![](plots/ci_plot_best_tuned1.png)
+
+```{r, echo = FALSE}
+#| label: tbl-rmses-tune
+#| tbl-cap: "Comparison of Best Mean RMSEs by Model"
+load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned2.rda"))
+rmse_kbl_best_tuned2
+```
+
+![](plots/ci_plot_best_tuned2.png)
 
 @tbl-rmses-tune and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
 
