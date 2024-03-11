@@ -35,7 +35,8 @@ cow_codes <- read_csv("data/raw/COW-country-codes.csv")
 
 # main preprocessing ----
 ## create preprocessing recipe ----
-ts_imp_rec <- preproc_data |> 
+## BDK: remember - scale of imputations at this step is marginal, so shouldn't have a huge effect on outcome
+ts_rec <- preproc_data |> 
   recipe(hr_score ~ .) |> 
   step_rm(PTS_A, PTS_H, PTS_S) |> 
   update_role(country_name, new_role = "id variable") |> 
@@ -48,28 +49,62 @@ ts_imp_rec <- preproc_data |>
     log10_e_gdppc = log10(e_gdppc)
   ) |> 
   step_rm(e_pop, e_gdp, e_gdppc) |> 
-  step_dummy(all_nominal_predictors()) |> 
-  step_zv(all_predictors()) |> 
-  step_normalize(all_numeric_predictors()) |> 
-  step_impute_knn(all_predictors()) |> 
+  step_dummy(
+    all_nominal_predictors()
+  ) |> 
+  step_impute_knn(
+    all_predictors()
+  ) |> 
   step_rm(
-    starts_with("year"),
-    starts_with("cowcode")
-  )
+    starts_with("year")
+  ) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_numeric_predictors())
 
 ## bake recipe ----
 set.seed(1226)
-ts_preproc <- ts_imp_rec |> 
+ts_preproc <- ts_rec |> 
   prep() |> 
   bake(new_data = NULL)
 
-## store mean & sd for pop, gdp, & gdppc ----
-ts_normal_stats <- ts_imp_rec |> 
-  prep() |> 
-  filter(
-    str_detect(terms, "^log")
+### store mean & sd for pop, gdp, & gdppc ----
+set.seed(1226)
+ts_normal_stats <- preproc_data |> 
+  recipe(hr_score ~ .) |> 
+  step_rm(PTS_A, PTS_H, PTS_S) |> 
+  update_role(country_name, new_role = "id variable") |> 
+  update_role(cow_year, new_role = "id variable") |> 
+  step_mutate(
+    cowcode = factor(cowcode),
+    year = factor(year),
+    log10_e_pop = log10(e_pop),
+    log10_e_gdp = log10(e_gdp),
+    log10_e_gdppc = log10(e_gdppc)
     ) |> 
-  select(-id)
+  step_rm(e_pop, e_gdp, e_gdppc) |> 
+  step_dummy(
+    all_nominal_predictors()
+    ) |> 
+  step_impute_knn(
+    all_predictors()
+    ) |> 
+  step_rm(
+    starts_with("year")
+    ) |> 
+  step_zv(all_predictors()) |> 
+  prep() |> 
+  bake(new_data = NULL) |> 
+  select(
+    starts_with("log")
+    ) |> 
+  pivot_longer(
+    cols = 1:3
+    ) |> 
+  group_by(name) |> 
+  summarize(
+    mean = mean(value),
+    sd = sd(value)
+    )
 
 ## create tsibble object ----
 ts_preproc <- preproc_data |> 
@@ -227,7 +262,7 @@ gg_miss_var(preproc_final)
 ## v2xel_loglec: 13 cases - 696x3, 540x3, 482x3, 115x3, 700x1
 
 ## add NAs for hr_score ----
-hr_score <- rep(NA, 522)
+hr_score <- rep(NA, nrow(preproc_final))
 
 preproc_final <- preproc_final |> 
   cbind(hr_score) |> 

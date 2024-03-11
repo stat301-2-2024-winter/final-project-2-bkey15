@@ -2,10 +2,10 @@
 data/results/fits_cv/baselines/base_fits.rda
 
 # post-assess cv fits
-data/results/post-assess/cv/log_gdp_cv.rda
-data/results/post-assess/cv/log_gdppc_cv.rda
-data/results/post-assess/cv/log_pop_cv.rda
-data/results/post-assess/cv/hrsc_cv.rda
+data/results/post-assess/cv/log_gdp_cv_2.rda
+data/results/post-assess/cv/log_gdppc_cv_2.rda
+data/results/post-assess/cv/log_pop_cv_2.rda
+data/results/post-assess/cv/hrsc_cv_2.rda
 
 # base_fits_la
 data/results/fits_cv/baselines/appendices/base_fits_la.rda

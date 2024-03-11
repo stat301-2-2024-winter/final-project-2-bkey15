@@ -39,6 +39,25 @@ library(here)
 [Final Project Github Repo (BDK)](https://github.com/stat301-2-2024-winter/final-project-2-bkey15)
 
 :::
+## Introduction
+
+### Prediction Problem
+
+Two of my three dissertation chapters rely on the use of a dependent variable measuring human rights respect. Hitherto, I have depended on Fariss's Human Rights (HR) Scores,^[For the original article wherein these scores were introduced, see [Fariss, 2014](http://cfariss.com/documents/Fariss2014APSR.pdf).] but he has not updated his dataset since 2020.^[See his [Dataverse page](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for evidence.] This is a problem insofar as it excludes the most recent country-year observations from my universe of cases entirely.^[That is, it is impossible to evaluate the relationship(s) between independent and dependent variables for cases where the latter is systematically missing.] In my [previous final project](https://github.com/stat301-1-2023-fall/final-project-1-bkey15), and by way of exploratory data analyses (EDAs), I identified a "raw" form of the physical violence index (PVI)---a simple average of the freedoms from political killings and torture indicators featured in the [Varieties of Democracy (V-Dem) dataset](https://v-dem.net/)---as a potential substitute for HR Scores. However, for this project, I aim to predict outright the missing data in HR scores whilst more formally appraising the suitability of the raw PVI as a simple substitute for HR scores.
+
+### Key Findings
+
+After implementing and assessing a diversity of methods to predict HR scores, as summarized in this report, I render the following conclusions:
+
+1. There exist more accurate ways to approximate HR scores than to use the raw PVI in lieu of it.
+2. Of these, the best-performing is a KNN-regression model.
+3. Time-series models exhibit even lower mean prediction errors, yet evidence suggests they may feature greater variance vis-à-vis the KNN model.
+
+### Overview
+
+The remainder of my report proceeds as follows:
+
+
 
 ## EDA of Target Variable {#sec-eda}
 
@@ -158,10 +177,10 @@ The processing times for these models, with parallel processing across eight cor
 5.    Random Forest: 92 minutes
 6.    Boosted Tree: 65 minutes
 
-Below is @tbl-rmses-tune, which gives the best mean RMSE of each tuned fit:
+Below is @tbl-rmses-tune1, which gives the best mean RMSE of each tuned fit:
 
 ```{r, echo = FALSE}
-#| label: tbl-rmses-tune
+#| label: tbl-rmses-tune1
 #| tbl-cap: "Comparison of Best Mean RMSEs by Model"
 load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned1.rda"))
 rmse_kbl_best_tuned1
@@ -181,7 +200,7 @@ Below is also a plot depicting the confidence intervals for each estimate:
 ![](plots/ci_plot_best_tuned1.png)
 
 ```{r, echo = FALSE}
-#| label: tbl-rmses-tune
+#| label: tbl-rmses-tune2
 #| tbl-cap: "Comparison of Best Mean RMSEs by Model"
 load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned2.rda"))
 rmse_kbl_best_tuned2
@@ -189,7 +208,7 @@ rmse_kbl_best_tuned2
 
 ![](plots/ci_plot_best_tuned2.png)
 
-@tbl-rmses-tune and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
+@tbl-rmses-tune1 and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
 
 ## Final Fit
 
@@ -202,7 +221,7 @@ load(here("data/results/final/final_perform_stats_kbl.rda"))
 final_perform_stats_kbl
 ```
 
-The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune). The MAE is about half has large as the RMSE; and at approximately 0.975, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 51.2\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
+The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune2). The MAE is about half has large as the RMSE; and at approximately 0.975, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 51.2\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
 
 The RMSE of approximately 0.227 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed (approximately) by $0.227*2$.] then, represents only about `r round(((0.2271517*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.227 does not seem to mean much either. Indeed, the examples of countries that experienced such a score change did not witness, to my knowledge, any appreciable changes in their underlying political milieus.^[For these examples, see `scripts/appendices/0_appendices.R`.]
 
