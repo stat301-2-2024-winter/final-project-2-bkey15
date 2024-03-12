@@ -132,7 +132,7 @@ max(hr_scores$theta_mean)
 # mean sd of hr_score ----
 mean(hr_scores$theta_sd)
 
-# 0.227 RMSE diff check ----
+# 0.23 RMSE diff check ----
 preproc_data <- preproc_data |> 
   mutate(
     hr_lag = dplyr::lag(hr_score),
@@ -148,4 +148,4 @@ preproc_data <- preproc_data |>
   )
 
 rmse_diff_check <- preproc_data |> 
-  filter(hr_lag_diff_abs >= 0.226 & hr_lag_diff_abs <= 0.228)
+  filter(hr_lag_diff_abs >= 0.229 & hr_lag_diff_abs <= 0.231)

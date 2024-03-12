@@ -179,3 +179,22 @@ ggsave(
   units = "px",
   file = here("plots/hr_score_dist_plots.png")
 )
+
+# check skew for pop, gdp, & gdppc ----
+preproc_data |> 
+  ggplot(
+    aes(x = e_pop)
+    ) + 
+  geom_density()
+
+preproc_data |> 
+  ggplot(
+    aes(x = e_gdp)
+  ) + 
+  geom_density()
+
+preproc_data |> 
+  ggplot(
+    aes(x = e_gdppc)
+  ) + 
+  geom_density()

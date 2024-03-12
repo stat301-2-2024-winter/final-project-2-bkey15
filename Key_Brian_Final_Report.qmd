@@ -123,34 +123,70 @@ Upon completion of these preprocessing steps, I split the data with proportions 
 
 ## Recipes {#sec-rec}
 
-My null (`null`) and basic baseline (`lm`) models (see @sec-base-fits) draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
+### Baselines
+
+My null (`null`) and basic baseline (`lm`) models (see @sec-base-fits) draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation of missing values: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
 
 Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
 
 -   Transforming country ID (`cowcode`) and year to a dummy variable.
--   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in the V-Dem dataset. For evidence that I have verified this, see `scripts/appendices/0_appendices.R`.]
--   Normalizing all numeric predictors.
+-   Log-transforming population, GDP, and GDP-per-capita.^[These variables are widely-known as right-skewed, and they are indeed so in V-Dem. For evidence that I have verified this, see `scripts/1b_data_quality_check.R`.]
 -   Removing the year dummies subsequent to KNN-imputation.
+-   Normalizing all numeric predictors.
 
-This final step is important. As a factor, year can continue to be used as an imputation predictor for V-Dem observations, because there will almost certainly be V-Dem data for future years;^[The 2024 V-Dem Dataset, which will provide data up to 2023, is scheduled to be released on 07 March 2024.] yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, because year is a factor, there is no way to estimate the relationship between "2023," "2024," etc. and HR Scores when there exists wholesale missingness of HR Scores for those years.]
+The penultimate of these steps is important. As a factor, year can continue to be used as an imputation predictor for V-Dem observations, because there will almost certainly be V-Dem data for future years; yet it cannot be used to predict HR Scores, for that variable ends in 2019.^[Put differently, because year is a factor, there is no way to estimate the relationship between "2023," "2024," etc. and HR Scores when there exists wholesale missingness of HR scores for those years.]
 
 In aggregate, the preprocessing steps results in a training set of 226 variables: 1 outcome, 2 ID variables,^[`country_name` and `cow_year`] and 223 predictors---179 of which are country dummies.
 
-Also included as a baseline in @sec-base-fits is a fourth recipe (`akt_lm`), which simply avails itself of my unscaled Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR Scores. I do so in order to test the appropriateness of merely substituting it for HR Scores.
+Also included as a baseline is a fourth recipe (identified in @sec-base-fits as `akt_lm`), which simply avails itself of my unscaled Political Violence Index (PVI), created in my previous final project, as the sole predictor of HR scores. I do so in order to test the appropriateness of merely substituting it for HR scores.
 
-The ridge, lasso, and elastic-net models seen in @sec-tune-fits use the same recipe as that underpinning the 5-neighbor baselines.^[See @sec-base-fits, below, for a discussion as to why I proceed with the 5-neighbor recipe for the tuning fits.] The KNN, random forest, and boosted tree models---also appearing in @sec-tune-fits---rely on a similar recipe, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.^[This means that the total number of predictors utilized by these models is 224---one more than that of the others.]
+### Tuning Models
 
-To summarize, the recipes I deploy and their apportionment to the models can be organized as follows:
+Additionally, I create recipes for six tuning models (see @sec-tune-fits):
 
-1.    Main:
-  -   5 Neighbors: basic baseline, null, ridge, lasso, elastic net
-  -   10 Neighbors: basic baseline, null
-  -   20 Neighbors: basic baseline, null
-2.    Tree:
-  -   5 Neighbors: KNN, random forest, boosted tree
+1.  Ridge
+2.  Lasso
+3.  Elastic net
+4.  KNN
+5.  Random forest
+6.  Boosted tree
+
+These recipes can be further categorized as either "kitchen-sink-" or "feature-engineering-" based:
+
+#### Kitchen Sink
+
+The kitchen-sink recipes are coterminous with the null and basic-baseline recipes, leveraging the full set of avaialbe predictors whilst eschewing nonessential preprocessing. The kitchen sink recipe for the KNN, random forest, and boosted tree models uses a recipe nearly-identical to that of the five-neighbor baselines, the only difference being the inclusion of one-hot encoding for the country-ID dummy variables.^[This means that the total number of predictors utilized by the "tree" models is 224, not 223.]
+
+#### Feature Engineering
+
+The feature-engineering recipes either expand on or curtail the universe of predictors available in the kitchen-sink recipes, above.
+
+The first simply includes interaction terms between GDP per capita and the four egalitarian indices, the logic being that greater GDP per capita is associated with greater respect for human rights conditional on the presence of high levels of equality.^[Put differently, I theorize that the correlation between mean wealth and human-rights respect is lower when wealth and power is unequally distributed, as may be such in many of the Gulf states.] This recipe is only applied to the ridge, lasso, and elastic-net models, bringing the total number of predictors in these instances to 227.^[Interaction terms are generally unnecessary for tree-based or KNN models, hence why this recipe is not applied to them.]
+
+The second retains most of these interaction terms and is again applied to the ridge, lasso, and elastic-net models, but is more multicollinearity averse,^[I experimented with `step_corr()` as a means of dealing with multicollinearity, but doing so failed to remove any variables from my prepped and baked dataset.] removing variables that simply average already-present variables (e.g., the unscaled PVI), are by nature aggregative (e.g., the high-level democracy indices), or are merely variants of already-present variables (e.g., the ordinal versions of the civil liberties index).^[The egalitarian component index is one of these removed variables, hence why the interaction term involving it is likewise removed.] Variables exhibiting low degrees of correlation with HR scores (e.g., the *de jure* suffrage index) are removed as well.^[See appendix for correlation graph.] In all, the number of predictors that this preprocessing yields is 207.
+
+The third takes the foregoing recipe and prepares it for the KNN, random forest, and boosted tree models, removing the interaction terms featured therein whilst also including one-hot encoding for the dummy variables. Accordingly, the number of predictors available in this recipe is 205.
+
+### Summary
+
+To recap, the recipes I deploy and their apportionment to the models can be organized as follows:
+
+1.  Kitchen Sink:
+    - Main:
+      - 5 neighbors: basic baseline, null
+      - 10 neighbors: basic baseline, null
+      - 20 neighbors: basic baseline, null
+    - Tree:
+      - 5 neighbors: KNN, random forest, boosted tree
+2.  Feature Engineering:
+    - Main:
+      - 5 neighbors, interactions only: ridge, lasso, elastic net
+      - 5 neighbors, multicollinearity averse: ridge, lasso, elastic net
+    - Tree:
+      - 5 neighbors, multicollinearity averse: KNN, random forest, boosted tree
 3.    Unscaled PVI
 
-These amount to five recipes in total: three "main," one "tree," and one additional baseline (unscaled PVI).
+These amount to eight recipes in total: four "kitchen sink," three "feature engineering," and one additional baseline (unscaled PVI). Within the first of these recipe groups is nine models, the second nine, and the third one, bringing the total number of models assessed to 19.
 
 ## Baseline Fits {#sec-base-fits}
 
@@ -165,22 +201,22 @@ rmse_kbl_base_fits
 
 As we can see, the null models perform well-worse than the basic baseline models; the unscaled PVI baseline splits the difference between the two.
 
-There are two important takeaways at this juncture, in my view. First, the basic baseline outperforms the unscaled PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR Scores than to use the unscaled PVI as a simple substitute for HR Scores. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger (or smaller) number with marginal impact on our findings.
+There appear to be two important takeaways at this juncture. First, the basic baseline outperforms the unscaled PVI baseline, meaning we can proceed knowing that there exist better ways to estimate HR scores than to use the unscaled PVI as a simple substitute for HR scores. Second, changes in the number of neighbors used for KNN-imputation seem to have little effect on model performance. This is good insofar as it is no longer a concern of ours; we will proceed with the `step_impute_knn()` default of `neighbors = 5` for all remaining workflows, though we theoretically could have selected a larger (or smaller) number with marginal impact on our findings.
 
 ## Tuned Fits {#sec-tune-fits}
 
-I subsequently tune the following hyperparameters for six models on the cross-validation folds:
+Tuned are the following hyperparameters on the cross-validation folds:
 
 1.    Ridge: `penalty`
 2.    Lasso: `penalty`
-3.    Elastic Net: `penalty` and `mixture`
+3.    Elastic net: `penalty` and `mixture`
 4.    KNN: `neighbors`
-5.    Random Forest: `mtry` and `min_n`
-6.    Boosted Tree: `mtry`, `min_n`, and `learn_rate`
+5.    Random forest: `mtry` and `min_n`
+6.    Boosted tree: `mtry`, `min_n`, and `learn_rate`
 
 For the creation of the respective tuning grids, the first four use `levels = 10`, whereas the latter two use `levels = 5`. The random forest model further uses `trees = 1000` and an `mtry` range set to `c(1, 15)`, whereas the boosted tree model uses the same `mtry` range and a `learn_rate` range set to `c(-3, -0.2)`.
 
-The processing times for these models, with parallel processing across eight cores where possible, were approximately as follows:^[I simply timed these with my computer's clock.]
+Taken from the most expansive recipe available,^[I.e., kitchen sink or feature engineering with interactions only.] the processing times for these models---with parallel processing across eight cores where possible---were approximately as follows:^[I simply timed these with my computer's clock.]
 
 1.    Ridge: 5 minutes
 2.    Lasso: 4 minutes
@@ -189,11 +225,13 @@ The processing times for these models, with parallel processing across eight cor
 5.    Random Forest: 92 minutes
 6.    Boosted Tree: 65 minutes
 
-Below is @tbl-rmses-tune1, which gives the best mean RMSE of each tuned fit:
+### Round 1: Kitchen Sink or Interactions Only
+
+Below is @tbl-rmses-tune1, which gives the best mean RMSE of each tuned fit. These results are united in that their underlying recipes allow for the greatest number of predictors possible.^[Recall that the kitchen sink recipe produces the greatest number of predictors for the KNN, random forest, and boosted tree models, whereas the feature-engineering with interactions-only recipe produces the greatest number of predictors for the ridge, lasso, and elastic net models. For more, see @sec-rec.]
 
 ```{r, echo = FALSE}
 #| label: tbl-rmses-tune1
-#| tbl-cap: "Comparison of Best Mean RMSEs by Model"
+#| tbl-cap: "Comparison of Best Mean RMSEs by Model (Kitchen Sink or Interactions Only)"
 load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned1.rda"))
 rmse_kbl_best_tuned1
 ```
@@ -201,15 +239,19 @@ rmse_kbl_best_tuned1
 The optimal tuning parameters for these models as assessed by mean RMSE are, respectively:
 
 -   KNN: `neighbors = 2`
--   Random Forest: `mtry = 14`, `min_n = 2`
--   Boosted Tree: `mtry = 14`, `min_n = 2`, `learn_rate = 0.631`
--   Elastic Net: `penalty = 1e-10`, `mixture = 0.683`
+-   Random Forest: `mtry = 15`, `min_n = 2`
+-   Boosted Tree: `mtry = 15`, `min_n = 2`, `learn_rate = 0.631`
+-   Elastic Net: `penalty = 1e-10`, `mixture = 0.778`
 -   Lasso: `penalty = 1e-10`
 -   Ridge: `penalty = 1e-10`
 
-Below is also a plot depicting the confidence intervals for each estimate:
+@fig-ci-tune1, below, depicts the confidence intervals for each RMSE estimate:
 
-![](plots/ci_plot_best_tuned1.png)
+![Ranking of Best Mean RMSEs with Confidence Intervals, Round 1](plots/ci_plot_best_tuned1.png){#fig-ci-tune1}
+
+### Round 2: Multicollinearity Averse
+
+Below is @tbl-rmses-tune2, which gives the best mean RMSE of each tuned fit. These results are united in that their underlying recipes are multicollinearity averse, and as such draw from a smaller set of predictors.^[For a summary of how variables were selected for removal, see @sec-rec.]
 
 ```{r, echo = FALSE}
 #| label: tbl-rmses-tune2
@@ -218,9 +260,22 @@ load(here("data/results/fits_cv/tuned/rmse_kbl_best_tuned2.rda"))
 rmse_kbl_best_tuned2
 ```
 
-![](plots/ci_plot_best_tuned2.png)
+The optimal tuning parameters for these models as assessed by mean RMSE are, respectively:
 
-@tbl-rmses-tune1 and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
+-   KNN: `neighbors = 2`
+-   Random Forest: `mtry = 15`, `min_n = 2`
+-   Boosted Tree: `mtry = 15`, `min_n = 2`, `learn_rate = 0.631`
+-   Elastic Net: `penalty = 0.000464`, `mixture = 0.889`
+-   Lasso: `penalty = 0.000464`
+-   Ridge: `penalty = 1e-10`
+
+@fig-ci-tune2, below, depicts the confidence intervals for each RMSE estimate:
+
+![Ranking of Best Mean RMSEs with Confidence Intervals, Round 2](plots/ci_plot_best_tuned2.png){#fig-ci-tune2}
+
+### Conclusion
+
+In each round, the best KNN model clearly outperforms the rest, yet it is with the multicollinearity-averse recipe that the best KNN model exhibits the lowest RMSE.^[Compare, in particular, the result in @tbl-rmses-tune1 and @tbl-rmses-tune2, respectively.] As such, we proceed with our final fit by selecting the best KNN model (`neighbors = 2`) and the multicollinearity-averse recipe.
 
 ## Final Fit {#sec-final-fit}
 
@@ -233,9 +288,9 @@ load(here("data/results/final/final_perform_stats_kbl.rda"))
 final_perform_stats_kbl
 ```
 
-The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune2). The MAE is about half has large as the RMSE; and at approximately 0.975, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 51.2\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
+The RMSE is even lower when compared to that of the cross-validation folds (@tbl-rmses-tune2). The MAE is about half has large as the RMSE; and at approximately 0.974, the $R^{2}$ statistic is exceedingly high. (The MAPE is about 59.8\%, but this is a small figure in absolute terms, the preponderance of HR scores being clustered around 0.)
 
-The RMSE of approximately 0.227 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed (approximately) by $0.227*2$.] then, represents only about `r round(((0.2271517*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/appendices/0_appendices.R`.] Qualitatively, a score difference of 0.227 does not seem to mean much either. Indeed, the examples of countries that experienced such a score change did not witness, to my knowledge, any appreciable changes in their underlying political milieus.^[For these examples, see `scripts/appendices/0_appendices.R`.]
+The RMSE of approximately 0.23 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed (approximately) by $0.23*2$.] then, represents only about `r round(((0.2305683*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/6_assess_final_model.R`.] Qualitatively, a score difference of 0.23 does not seem to mean much either. Indeed, the examples of countries that experienced such a score change did not witness, to my knowledge, any appreciable changes in their underlying political milieus.^[For these examples, see `scripts/6_assess_final_model.R`.]
 
 To round off this discussion is the below scatterplot, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
 

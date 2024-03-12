@@ -23,6 +23,10 @@ load(here("data/splits/test.rda"))
 # load final fit ----
 load(here("data/results/final/final_fit.rda"))
 
+# load hr_scores & preproc_data ----
+hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
+load(here("data/preprocessed/preproc_data.rda"))
+
 # predict w/ final fit on testing ----
 final_predicts <- test |> 
   select(cowcode, year, cow_year, country_name, hr_score) |> 
@@ -77,7 +81,7 @@ scatt_plot_final_predicts <- final_predicts |>
     y = "Predicted",
     title = "Scatterplot: HR Score, Actual vs. Predicted",
     subtitle = "Predictions generated from a KNN model",
-    caption = "Sources: HR Scores (2020) & V-Dem (2023)"
+    caption = "Sources: HR Scores (2020) & V-Dem (2024)"
   ) +
   theme_solarized()
 
@@ -89,3 +93,24 @@ ggsave(
   units = "px",
   file = here("plots/scatt_plot_final_predicts.png")
 )
+
+# mean sd of hr_score ----
+mean(hr_scores$theta_sd)
+
+# 0.23 RMSE diff check ----
+preproc_data <- preproc_data |> 
+  mutate(
+    hr_lag = dplyr::lag(hr_score),
+    hr_lag_diff_abs = abs(hr_score - hr_lag)
+  ) |> 
+  relocate(
+    hr_lag,
+    .after = hr_score
+  ) |> 
+  relocate(
+    hr_lag_diff_abs,
+    .after = hr_lag
+  )
+
+rmse_diff_check <- preproc_data |> 
+  filter(hr_lag_diff_abs >= 0.229 & hr_lag_diff_abs <= 0.231)
