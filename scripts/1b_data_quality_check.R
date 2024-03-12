@@ -17,8 +17,69 @@ library(ggthemes)
 tidymodels_prefer()
 
 # load data ----
+vdem <- vdem
 hr_scores <- read_csv("data/raw/HumanRightsProtectionScores_v4.01.csv")
 load(here("data/preprocessed/preproc_data.rda"))
+
+# vdem obs counts ----
+vdem |> 
+  filter(year > 1945 & year < 2020) |> 
+  summarize(n = n())
+
+vdem |> 
+  filter(year > 2019) |> 
+  summarize(n = n())
+
+# vdem missingness ----
+## overall (non-ids) ----
+vdem |> 
+  filter(year > 1945 & year < 2020) |> 
+  select(23:4607) |> 
+  pct_miss()
+
+## main & mid-level indices ----
+vdem |> 
+  filter(year > 1945 & year < 2020) |> 
+  select(
+    v2x_polyarchy,
+    v2x_libdem,
+    v2x_partipdem,
+    v2x_delibdem,
+    v2x_egaldem
+    ) |> 
+  pct_miss()
+
+vdem |> 
+  filter(year > 1945 & year < 2020) |> 
+  select(
+    v2x_api,
+    v2x_mpi,
+    v2x_freexp_altinf,
+    v2x_frassoc_thick,
+    v2x_suffr,
+    v2xel_frefair,
+    v2x_elecoff,
+    v2x_liberal,
+    v2xcl_rol,
+    v2x_jucon,
+    v2xlg_legcon,
+    v2x_partip,
+    v2x_cspart,
+    v2xdd_dd,
+    v2xel_locelec,
+    v2xel_regelec,
+    v2xdl_delib,
+    v2x_egal,
+    v2xeg_eqprotec,
+    v2xeg_eqaccess,
+    v2xeg_eqdr
+  ) |> 
+  pct_miss()
+
+# preproc missingness ----
+preproc_data |> 
+  select(5:49) |> 
+  pct_miss()
 
 # viz. hr_scores ----
 ## OG obs ----

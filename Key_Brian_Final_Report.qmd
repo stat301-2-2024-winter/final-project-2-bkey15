@@ -43,46 +43,56 @@ library(here)
 
 ### Prediction Problem
 
-Two of my three dissertation chapters rely on the use of a dependent variable measuring human rights respect. Hitherto, I have depended on Fariss's Human Rights (HR) Scores,^[For the original article wherein these scores were introduced, see [Fariss, 2014](http://cfariss.com/documents/Fariss2014APSR.pdf).] but he has not updated his dataset since 2020.^[See his [Dataverse page](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for evidence.] This is a problem insofar as it excludes the most recent country-year observations from my universe of cases entirely.^[That is, it is impossible to evaluate the relationship(s) between independent and dependent variables for cases where the latter is systematically missing.] In my [previous final project](https://github.com/stat301-1-2023-fall/final-project-1-bkey15), and by way of exploratory data analyses (EDAs), I identified a "raw" form of the physical violence index (PVI)---a simple average of the freedoms from political killings and torture indicators featured in the [Varieties of Democracy (V-Dem) dataset](https://v-dem.net/)---as a potential substitute for HR Scores. However, for this project, I aim to predict outright the missing data in HR scores whilst more formally appraising the suitability of the raw PVI as a simple substitute for HR scores.
+Two of my three dissertation chapters rely on the use of a dependent variable measuring human rights respect. Hitherto, I have depended on Fariss's Human Rights (HR) Scores,^[For the original article wherein these scores were introduced, see [Fariss, 2014](http://cfariss.com/documents/Fariss2014APSR.pdf).] but he has not updated his dataset since 2020.^[See his [Dataverse page](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for evidence.] This poses a problem insofar as it excludes the most recent country-year observations from my universe of cases entirely.^[That is, it is impossible to evaluate the relationship(s) between independent and dependent variables for cases where the latter is systematically missing.] In my [previous final project](https://github.com/stat301-1-2023-fall/final-project-1-bkey15), and by way of exploratory data analyses (EDAs), I identified a "raw" form of the physical violence index (PVI)---a simple average of the freedoms from political killings and torture indicators featured in the [Varieties of Democracy (V-Dem) dataset](https://v-dem.net/)---as a potential substitute for HR scores. However, for this project, I aim to predict outright the missing data in HR scores whilst more formally appraising the suitability of the raw PVI as a simple substitute for HR scores.
 
 ### Key Findings
 
 After implementing and assessing a diversity of methods to predict HR scores, as summarized in this report, I render the following conclusions:
 
-1. There exist more accurate ways to approximate HR scores than to use the raw PVI in lieu of it.
-2. Of these, the best-performing is a KNN-regression model.
-3. Time-series models exhibit even lower mean prediction errors, yet evidence suggests they may feature greater variance vis-à-vis the KNN model.
+1. There exist more accurate ways to approximate HR scores than to use the raw PVI in lieu of it (see @sec-base-fits).
+2. Of these, the best-performing is a KNN-regression model (see @sec-tune-fits).
+3. Time-series models exhibit even lower mean prediction errors, yet evidence suggests they may feature greater variance vis-à-vis the KNN model (see @sec-ts).
 
-### Overview
+### Overview of Report
 
-The remainder of my report proceeds as follows:
+The remainder of my report is organized as follows:
 
+1.  An overview of HR scores and V-Dem, including an EDA of the former (@sec-dat-ov).
+2.  A description of initial data preprocessing (@sec-preproc).
+3.  A summary of the recipes used (@sec-rec).
+4.  The results of the baseline fits (@sec-base-fits).
+5.  The results of the tuned fits (@sec-tune-fits).
+6.  The final fit's predictions and an analysis thereof (@sec-final-fit).
+7.  A discussion of time-series predictions and how they compare to those of the final fit (@sec-ts)
+8.  Appendices (@sec-appen)
 
+## Data Overview {#sec-dat-ov}
 
-## EDA of Target Variable {#sec-eda}
+### HR Scores
 
-In my previous memo, I failed to provide a visualization of the distribution of HR Scores, so I do so here:
+The HR Scores dataset, which features the HR scores variable,^[This variable is denominated `theta_mean` in the original dataset. For the remainder of the report, I use "HR scores" to refer to this specific variable, not the dataset from which it originates.] consists of 11275 country-year observations spanning the period 1946-2019. The HR scores variable lacks missingness, with every observation possessing an HR score.
 
-![](plots/hr_score_OG_dist_plots.png)
+#### EDA of HR Scores
 
-The above shows that HR Scores isn't distributed in a perfectly symmetrical manner, featuring a slight right-skew and a degree of bimodality. Nevertheless, these features seem relatively minor, and most methods available to correct them do not apply given the nature of the variable.^[Namely, square-root, log, and Box-Cox transformations only work for positive variables, but approximately half of HR Scores' values are negative.]
+The distribution of HR scores may be visualized as follows:
 
-Below, however, is evidence that I have attempted a Yeo-Johnson transformation of HR Scores:
+![Distribution of HR Scores (Density & Box Plots)](plots/hr_score_OG_dist_plots.png){#fig-hr-dist}
 
-![](plots/appendices/yj_dist_plots.png)
+@fig-hr-dist shows that the variable isn't distributed in a perfectly symmetrical manner, exhibiting a slight right-skew and a degree of bimodality. Nevertheless, these features seem relatively minor, and most methods available to correct them do not apply given the nature of the variable.^[Namely, square-root, log, and Box-Cox transformations only work for positive variables, but approximately half of HR Scores' values are negative.] I also attempted a Yeo-Johnson transformation of HR scores, but it failed to adequately rectify the problems of skewness and bimodality.^[For more, see @fig-yj] In view of these considerations, I proceed by keeping HR scores unaltered.
 
-The transformation does rectify the right-skew, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature. In tandem with my present inability to compute the transformed variable's inverse subsequent to model fitting, these considerations prompt me to proceed with HR Scores unaltered, though I welcome feedback as to whether this is the right step to take.
+### V-Dem
+
+The 2024 version of V-Dem (V14) fully consists of 4607 variables and 27734 country-year observations spanning the period 1789-2023. 12185 of these observations cover the years 1946-2019, whereas 716 of them cover 2020-2023. Overall, the dataset features an appreciable degree of missingness, with approximately 26.36\% of values in the 1946-2019 period being absent.^[This figure is calculated from all non-ID variables. See `scripts/1b_data_quality_check.R` for the computation.] However, rates of missingness are vastly lower for the five "high-level" democracy indices (approximately 0.30\%) and the twenty-one "mid-level" components of said indices (approximately 0.59\% ).^[See `scripts/1b_data_quality_check.R` again for the relevant computations.] These missingness rates are reduced even further following pre-recipe preprocessing (see @sec-preproc).
 
 ## Pre-Recipe Preprocessing {#sec-preproc}
 
 Prior to writing my recipes, I complete the following noteworthy preprocessing steps:
 
--   Merge the V-Dem, HR Scores, and Political Terror Scale (PTS) datasets. At the outset, I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.
--   For the V-Dem dataset, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this justifiable on two counts:
-    1. Fariss assigns the Czech Republic `cowcode` to Czechoslovakia.
+-   Merge V-Dem and HR Scores.^[My actual code also merges these datasets with the Political Terror Scale (PTS) dataset. At the outset, I desired to include variables from the latter in my models, as they were explicitly noted as inputs for the original HR Scores; however, they featured widespread missingness, to the extent that imputing their values proved to be computationally infeasible.]
+-   For V-Dem, recode Czechoslovakia's pre-Velvet Divorce (1992) observations as those of the Czech Republic.^[I.e., recode `cowcode == 315` (Czechoslovakia) to `cowcode == 316` (Czech Republic).] Doing so rectifies widespread missingness in this case. I deemed this justifiable on two counts:
+    1. Fariss assigns the Czech Republic COW code to Czechoslovakia.
     2. V-Dem denominates both Czechoslovakia and the Czech Republic "Czechia"; there is no overlap in naming conventions or otherwise with Slovakia, which doesn't appear in the dataset until 1993.
--   Remove country-years that appear in HR Scores but are systematically absent in V-Dem---cases where the value on "N Missing" is positive as shown in @tbl-vdem-miss, below:
-
+-   Given the wholesale absence of predictors and thus the virtual impossibility of prediction-making, remove country-years that appear in HR scores but not in V-Dem. These cases appear in @tbl-vdem-miss, below, where the value on "N Missing" is positive:
 
 ```{r, echo = FALSE}
 #| label: tbl-vdem-miss
@@ -94,24 +104,26 @@ dattbl_vdem_miss
 -   These observations mainly involve:
     1. Post-Soviet states (e.g., Armenia, Azerbaijan, etc.) and post-WWII states (e.g., West and East Germany).
     2. European microstates (e.g., Liechtenstein and Monaco) and small island states (e.g., Samoa, St. Vincent and the Grenadines, etc.).
--   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my project entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data whatsoever---including the most basic of figures, such as population, GDP, etc.---on which reasonably-accurate imputations might be based. I proceed from here, unfortunately having to live with this limitation to my projections, though I again welcome feedback as to whether I've made the right choice.
--   Select as predictors the variables I identified in my previous final project as being related in theory to HR Scores, as well as the entirety of V-Dem's high-level and medium-level indices.
+-   The former is more tolerable, for they stem from minor discrepancies in coding start/end dates and only pertain to a handful of years. The latter invites more reason for pause; indeed, to delete these observations is effectively to remove the world's smallest countries from the ambit of my research entirely. Nevertheless, it doesn't make sense, in my estimation, to retain them when there exist no data in V-Dem whatsoever---including the most basic of figures, such as population, GDP, etc.---on which even somewhat-credible imputations might be based.
+-   Select as predictors the variables I identified in my previous final project as being related in theory to HR scores, as well as the entirety of V-Dem's high-level and medium-level indices. I do so primarily to minimize my computational workload, but also under the intuition that including variables beyond this set would yield diminishing returns with respect to accuracy.^[That is, including more variables would bring fewer improvements to predictive accuracy at the expense of computational speed.]
 
-Upon considering and completing these steps, I move forward with a preprocessed dataset of 52 variables and 10524 observations. The plot below demonstrates that the preprocessing steps involving HR Scores does not significantly alter the distribution thereof:^[Admittedly, the distribution might be marginally more right-skewed; this likely owes itself to the removal of the European microstates, whose human rights levels are generally very high.]
+Upon considering and completing these steps, I move forward with a preprocessed dataset of 49 variables and 10524 observations.^[My saved preprocessed dataset actually contains 52 variables, but three of these are PTS metrics that are removed at the beginning of recipe preprocessing.] The plot below demonstrates that the preprocessing steps involving HR scores does not significantly alter the distribution thereof:^[Compare with @fig-hr-dist. Admittedly, the distribution might be marginally more right-skewed; this likely owes itself to the removal of the European microstates, whose human rights levels are generally very high.]
 
-![](plots/hr_score_dist_plots.png)
+![Distribution of HR Scores, Preprocessed (Density & Box Plots)](plots/hr_score_dist_plots.png){#fig-hr-dist-preproc}
 
-The preprocessed dataset also exhibits a low degree of missingness, as demonstrated by the plot below, meaning that the computational demands for our imputations should be rather low in turn:
+The preprocessed dataset also exhibits an exceedingly low degree of missingness relative to that of V-Dem overall (see @sec-dat-ov), with only about about 0.19% of values from non-ID variables being missing. @fig-preproc-miss, below, summarizes this missingness by predictor:
 
-![](plots/preproc_miss_plot.png)
+![Number of Missing Values by Predictor, Preprocessed Dataset](plots/preproc_miss_plot.png){#fig-preproc-miss}
 
-## Data Splitting Specifications
+Ultimately, in virtue of the minimal extent of missingness, imputations are unlikely to prove computationally demanding or to appreciably qualify the credibility of predictions generated therefrom.
 
-I opted to split my data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split was repeated five times, resulting in a total of 50 folds.
+### Data Splitting Specifications
+
+Upon completion of these preprocessing steps, I split the data with proportions of 75-25 training/testing, 90-10 analysis/assessment. The cross-validation split is repeated five times, resulting in a total of 50 folds.
 
 ## Recipes {#sec-rec}
 
-My null (`null`) and basic baseline (`lm`) models---analyzed in @sec-base-fits---draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
+My null (`null`) and basic baseline (`lm`) models (see @sec-base-fits) draw on three recipes, each distinguished by the number of neighbors set for KNN-imputation: 5, 10, and 20, respectively.^[I considered bagged-tree imputation as well, but it proved computationally infeasible.] I establish and test these recipe variants, at this stage, to appraise the extent to which changes in the number of neighbors set for imputation effectuate changes in model performance.
 
 Aside from KNN-imputation, the main preprocessing components shared by each recipe-group are as follows:
 
@@ -210,7 +222,7 @@ rmse_kbl_best_tuned2
 
 @tbl-rmses-tune1 and the above plot evince that, while the best random-forest model possesses the lowest standard error, it is the best KNN model that has the lowest mean RMSE and confidence interval thereof. As such, we proceed with our final fit by selecting the best KNN model.
 
-## Final Fit
+## Final Fit {#sec-final-fit}
 
 @tbl-metrics-final, below, gives the performance metrics for the final fit applied to the testing set:
 
@@ -229,9 +241,11 @@ To round off this discussion is the below scatterplot, which depicts the relatio
 
 ![](plots/scatt_plot_final_predicts.png)
 
-## Remaining Considerations
+## Time-Series Predictions {#sec-ts}
 
-At this stage, I feel as though my final project is near to completion. Aside from the issues I've already identified as meriting potential feedback---namely, Yeo-Johnson transformation of the outcome (@sec-eda) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
+### Remaining Considerations
+
+At this stage, I feel as though my final project is near to completion. Aside from the issues I've already identified as meriting potential feedback---namely, Yeo-Johnson transformation of the outcome (@sec-dat-ov) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
 
 Needless to say, four of my five recipes are effectively "kitchen sink" in kind (the outlier being the unscaled PVI recipe). The V-Dem variables capture interrelated phenomena (e.g., elections and civil liberties) and occasionally comprise additive measures as well as their inputs (e.g., PVI and its components, the political killings and torture metrics). They also contain variants of the same variable set to different scales (e.g., the three-point, four-point, and five-point versions of the PVI). A particularly concerning example of this, to me, is the inclusion of both the unscaled PVI and original (unscaled) PVI, the latter simply being the former set to a 0-to-1 scale. The two are hence tightly related, namely through a logistic function, as demonstrated in the plot below:^[My work in this section can be found in `scripts/appendices/`.]
 
@@ -273,3 +287,12 @@ rmse_kbl_base_fits_ma
 The basic baseline (`*_lm`) results seemingly signify a deterioration in quality: vis-à-vis the metrics seen in @tbl-rmses-base, the models perform worse, with gradual yet consistent increases in both mean RMSE and standard error as they become more multicollinearity averse.
 
 If predictive accuracy is the chief objective, then these results suggest that I should not, in fact, proceed with the multicollinearity-averse recipes---irrespective of whether I ultimately use the values produced from my model for inferential tasks. Nevertheless, I am open to feedback that would confirm or challenge my interpretation of or decision-making around this topic.
+
+## Appendices {#sec-appen}
+
+### Distribution of Yeo-Johnson-transformed HR scores
+
+![Distribution of Yeo-Johnson-transformed HR Scores (Density & Box Plots)](plots/appendices/yj_dist_plots.png){#fig-yj}
+
+The transformation does rectify the right-skew seen in @fig-hr-dist, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature.
+
