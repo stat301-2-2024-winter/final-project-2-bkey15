@@ -37,9 +37,6 @@ load(here("data/results/post-assess/predictions/log_gdppc_ts_predicts.rda"))
 ## final fit
 load(here("data/results/final/final_fit.rda"))
 
-test <- final_fit |> 
-  extract_fit_parsnip()
-
 # prep for final predictions ----
 ## merge preproc_final w/ new predictions ----
 ### extract predictions on original scale ----
@@ -82,6 +79,7 @@ preproc_full <- preproc_data |>
   full_join(preproc_final)
 
 # predict w/ final fit on 2020+ observations ----
+## BDK: no need to use preproc_full; will generate same results
 final_predicts <- preproc_final |> 
   select(cowcode, year, cow_year, country_name, hr_score) |> 
   bind_cols(
@@ -103,7 +101,7 @@ final_predicts |>
   save(file = here("data/results/post-assess/predictions/final_predicts.rda"))
 
 # plot preds ----
-final_predicts |> 
+scatt_plot_ts_knn <- final_predicts |> 
   ggplot(
     aes(
       x = ts_preds,
@@ -117,11 +115,19 @@ final_predicts |>
     x = "HR Score (Time-Series)",
     y = "HR Score (KNN)",
     title = "Scatterplot: Time Series vs. KNN Model Predictions",
-    subtitle = "Values are for country-years from 2020-2022"
+    subtitle = "Values are for country-years from 2020-2023"
   ) +
   theme_solarized()
 
-final_predicts |> 
+ggsave(
+  scatt_plot_ts_knn,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/scatt_plot_ts_knn.png")
+  )
+
+dens_plot_ts_knn <- final_predicts |> 
   pivot_longer(
     cols = 5:6,
     names_to = "pred_type",
@@ -147,8 +153,16 @@ final_predicts |>
     x = "HR Score Predictions",
     y = "Density",
     color = "Method",
-    title = "Density Plots: Time Series vs. KNN Model Prediction",
+    title = "Density Plots: Time Series vs. KNN Model Predictions",
     subtitle = "Values from country-years (2020-2022)"
     ) +
   theme_solarized()
+
+ggsave(
+  dens_plot_ts_knn,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("plots/dens_plot_ts_knn.png")
+)
 

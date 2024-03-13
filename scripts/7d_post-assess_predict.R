@@ -56,14 +56,14 @@ hrsc_ets_predicts <- hrsc_ets_better |>
   model(
     ETS(hr_score)
     ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 hrsc_serb_predicts <- ts_preproc |> 
   filter(cowcode == 345) |> 
   model(
     ETS(hr_score)
     ) |>
-  forecast(h = "4 years")
+  forecast(h = "5 years")
 
 hrsc_ets_predicts <- bind_rows(
   hrsc_ets_predicts,
@@ -81,7 +81,7 @@ hrsc_arima_predicts <- hrsc_arima_better |>
   model(
     ARIMA(hr_score)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 ### combine ----
 ### BDK: filtering out cases that left the dataset decades ago
@@ -151,14 +151,14 @@ log_pop_ets_predicts <- log_pop_ets_better |>
   model(
     ETS(log10_e_pop)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 log_pop_serb_predicts <- ts_preproc |> 
   filter(cowcode == 345) |> 
   model(
     ETS(log10_e_pop)
   ) |>
-  forecast(h = "4 years")
+  forecast(h = "5 years")
 
 log_pop_ets_predicts <- bind_rows(
   log_pop_ets_predicts,
@@ -176,7 +176,7 @@ log_pop_arima_predicts <- log_pop_arima_better |>
   model(
     ARIMA(log10_e_pop)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 ### combine ----
 log_pop_ts_predicts <- bind_rows(
@@ -189,18 +189,18 @@ log_pop_ts_predicts <- bind_rows(
 #### append xbar & s ----
 #### BDK: see notes for underlying formula
 log_pop_norm_xbar <- ts_normal_stats |> 
-  filter(terms == "log10_e_pop" & statistic == "mean") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_pop") |> 
+  select(mean) |> 
+  pull(mean) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_pop_norm_xbar = value)
 
 log_pop_norm_s <- ts_normal_stats |> 
-  filter(terms == "log10_e_pop" & statistic == "sd") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_pop") |> 
+  select(sd) |> 
+  pull(sd) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_pop_norm_s = value)
 
@@ -258,14 +258,14 @@ log_gdp_ets_predicts <- log_gdp_ets_better |>
   model(
     ETS(log10_e_gdp)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 log_gdp_serb_predicts <- ts_preproc |> 
   filter(cowcode == 345) |> 
   model(
     ETS(log10_e_gdp)
   ) |>
-  forecast(h = "4 years")
+  forecast(h = "5 years")
 
 log_gdp_ets_predicts <- bind_rows(
   log_gdp_ets_predicts,
@@ -283,7 +283,7 @@ log_gdp_arima_predicts <- log_gdp_arima_better |>
   model(
     ARIMA(log10_e_gdp)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 ### combine ----
 log_gdp_ts_predicts <- bind_rows(
@@ -295,18 +295,18 @@ log_gdp_ts_predicts <- bind_rows(
 ### un-normalize & un-log predicts ----
 #### append xbar & s ----
 log_gdp_norm_xbar <- ts_normal_stats |> 
-  filter(terms == "log10_e_gdp" & statistic == "mean") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_gdp") |> 
+  select(mean) |> 
+  pull(mean) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_gdp_norm_xbar = value)
 
 log_gdp_norm_s <- ts_normal_stats |> 
-  filter(terms == "log10_e_gdp" & statistic == "sd") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_gdp") |> 
+  select(sd) |> 
+  pull(sd) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_gdp_norm_s = value)
 
@@ -315,8 +315,6 @@ log_gdp_ts_predicts <- log_gdp_ts_predicts |>
     log_gdp_norm_xbar,
     log_gdp_norm_s
     )
-
-load(here("data/results/post-assess/predictions/log_gdp_ts_predicts.rda"))
 
 #### un-normalize ----
 log_gdp_ts_predicts <- log_gdp_ts_predicts |> 
@@ -366,14 +364,14 @@ log_gdppc_ets_predicts <- log_gdppc_ets_better |>
   model(
     ETS(log10_e_gdppc)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 log_gdppc_serb_predicts <- ts_preproc |> 
   filter(cowcode == 345) |> 
   model(
     ETS(log10_e_gdppc)
   ) |>
-  forecast(h = "4 years")
+  forecast(h = "5 years")
 
 log_gdppc_ets_predicts <- bind_rows(
   log_gdppc_ets_predicts,
@@ -391,7 +389,7 @@ log_gdppc_arima_predicts <- log_gdppc_arima_better |>
   model(
     ARIMA(log10_e_gdppc)
   ) |>
-  forecast(h = "3 years")
+  forecast(h = "4 years")
 
 ### combine ----
 log_gdppc_ts_predicts <- bind_rows(
@@ -403,18 +401,18 @@ log_gdppc_ts_predicts <- bind_rows(
 ### un-normalize & un-log predicts ----
 #### append xbar & s ----
 log_gdppc_norm_xbar <- ts_normal_stats |> 
-  filter(terms == "log10_e_gdppc" & statistic == "mean") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_gdppc") |> 
+  select(mean) |> 
+  pull(mean) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_gdppc_norm_xbar = value)
 
 log_gdppc_norm_s <- ts_normal_stats |> 
-  filter(terms == "log10_e_gdppc" & statistic == "sd") |> 
-  select(value) |> 
-  pull(value) |> 
-  rep(523) |> 
+  filter(name == "log10_e_gdppc") |> 
+  select(sd) |> 
+  pull(sd) |> 
+  rep(697) |> 
   as_tibble() |> 
   rename(log_gdppc_norm_s = value)
 
@@ -423,8 +421,6 @@ log_gdppc_ts_predicts <- log_gdppc_ts_predicts |>
     log_gdppc_norm_xbar,
     log_gdppc_norm_s
     )
-
-load(here("data/results/post-assess/predictions/log_gdppc_ts_predicts.rda"))
 
 #### un-normalize ----
 log_gdppc_ts_predicts <- log_gdppc_ts_predicts |> 

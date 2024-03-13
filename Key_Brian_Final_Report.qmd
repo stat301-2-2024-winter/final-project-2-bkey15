@@ -292,56 +292,37 @@ The RMSE is even lower when compared to that of the cross-validation folds (@tbl
 
 The RMSE of approximately 0.23 represents an exceedingly marginal difference. For the full set of HR Scores, the minimum is approximately `r round(-3.459534, digits = 2)`, while the maximum is approximately `r round(5.336182, digits = 2)`, for a range of approximately `r round(8.795716, digits = 2)`; the RMSE's range,^[Computed (approximately) by $0.23*2$.] then, represents only about `r round(((0.2305683*2)/8.795716)*100, digits = 2)`\% of the full range. Recalling that HR Scores are themselves estimates with a mean standard deviation of approximately `r round(0.3338768, digits = 2)` lends further credibility to the accuracy of our model.^[For the code computing this figure, see `scripts/6_assess_final_model.R`.] Qualitatively, a score difference of 0.23 does not seem to mean much either. Indeed, the examples of countries that experienced such a score change did not witness, to my knowledge, any appreciable changes in their underlying political milieus.^[For these examples, see `scripts/6_assess_final_model.R`.]
 
-To round off this discussion is the below scatterplot, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
+To round off this discussion is @fig-hr-preds, below, which depicts the relationship between our predictions and actual values in the testing set, illustrating the tight fit---and hence high degree of accuracy---of our final model:
 
-![](plots/scatt_plot_final_predicts.png)
+![Actual vs. Predicted HR Scores, Testing Set](plots/scatt_plot_final_predicts.png){#fig-hr-preds}
 
 ## Time-Series Predictions {#sec-ts}
 
-### Remaining Considerations
+### Overview
 
-At this stage, I feel as though my final project is near to completion. Aside from the issues I've already identified as meriting potential feedback---namely, Yeo-Johnson transformation of the outcome (@sec-dat-ov) and the removal of certain countries from the dataset (@sec-preproc)---I welcome advice as to how to think about, or tackle if necessary, the issue of multicollinearity.
+Going beyond the requirements of this assignment, I extend my analysis by not only building time-series models to predict HR scores, but also predicting HR scores with the final fit applied to more recent data. In doing so, I aim to 1.) assess whether even more accurate methods of estimating HR scores may exist, and 2.) demonstrate that using my final KNN model on more recent data is achievable.^[My work for this section can be viewed in `scripts/7*.R`]
 
-Needless to say, four of my five recipes are effectively "kitchen sink" in kind (the outlier being the unscaled PVI recipe). The V-Dem variables capture interrelated phenomena (e.g., elections and civil liberties) and occasionally comprise additive measures as well as their inputs (e.g., PVI and its components, the political killings and torture metrics). They also contain variants of the same variable set to different scales (e.g., the three-point, four-point, and five-point versions of the PVI). A particularly concerning example of this, to me, is the inclusion of both the unscaled PVI and original (unscaled) PVI, the latter simply being the former set to a 0-to-1 scale. The two are hence tightly related, namely through a logistic function, as demonstrated in the plot below:^[My work in this section can be found in `scripts/appendices/`.]
+### Preprocessing
 
-![](plots/scatt_plot_pvi.png)
+Before running any models, I preprocess my 1946-2019 data such that it is suitable for time-series analyses. To do so, I convert the original preprocessed dataset (see @sec-preproc) to a `tsibble` object, prior to which I rectify missingness with KNN imputation.^[This is mainly done to address a handful of cases for population and GDP per capita. The scale of missingness here is infinitesimal, such that imputation variations are highly unlikely to affect the predictions. I considered [interpolation](https://otexts.com/fpp3/missing-outliers.html) as a means of dealing with this missingness; but the predictions, in my estimation, seemed to deviate too greatly from what were the likely values.] Furthermore, for the final fit, I create a version of the original preprocessed dataset that covers the years 2020-2023, exclusively.
 
-I opted to include all such variants, for I didn't want to presuppose that one would be "better" in predicting HR Scores than the other(s). I'm also of the understanding that multicollinearity may be less of a concern for prediction problems such as ours, where the primary objective is simply to produce the most accurate estimates possible---in contrast to inference problems, where robust coefficients and p-values are the gold standard. Nonetheless, I remain worried about the impact of multicollinearity on the strength of my predictions.
+### Methods
 
-To this end, I created and briefly tested two sets of new recipes from my original set of "main" recipes (@sec-rec), both of which are multicollinearity averse. The first is less averse, simply removing the scaled PVI^[`v2x_clphy`] as a predictor from each main recipe.^[I do, however, allow the scaled PVI to be present for the KNN-imputation step. This is also true for all other variable-variants in the more-averse set of recipes.] The second is more averse, removing not only said variable, but also all other variable-variants as predictors.^[These variables are, namely, the PVI Ordinal (`e_v2x_clphy *_3C, *_4C, *_5C`), the Equality before the Law and Individual Liberty Index Ordinal (`e_v2xcl_rol *_3C, *_4C, *_5C`), and the Civil Liberties Index Ordinal (`e_v2x_civlib *_3C, *_4C, *_5C`).]
+The methods I use to construct my time series models are generally set forth in the textbook [Forecasting: Principles and Practice (Hyndman & Athanasopoulos, 2021)](https://otexts.com/fpp3/), which itself makes heavy use of the `fable` and `tsibble` R packages.
 
-For now, I tested these recipes on the baseline models, exclusively. Therefore, the recipes I deployed and their apportionment to the models can be organized as follows:
+First, I use time series cross-validation to compare univariate ARIMA (autoregressive integrated moving average) and ETS (exponential smoothing) models in predicting HR scores, population, and GDP per capita for the period 2020-2023, for all three are systematically missing therein.^[My actual code also predicts GDP, though this is unnecessary given that the variable is removed in the final KNN model. Interestingly, population, GDP, and GDP per capita are Fariss variables as well, and they too have not been updated since 2020. For evidence, see the V-Dem Codebook (V14).] Next, I select the best model for each time series (i.e., country) and render predictions therefrom. Finally, I apply my final fit to the 2020-2023 data---my population and GDP-per-capita predictions having been appended thereto---and compare the predictions from the pure time-series and KNN-model methods.
 
-1.    Least Averse:
-  -   5 Neighbors: basic baseline, null
-  -   10 Neighbors: basic baseline, null
-  -   20 Neighbors: basic baseline, null
-2.    Most Averse:
-  -   5 Neighbors: basic baseline, null
-  -   10 Neighbors: basic baseline, null
-  -   20 Neighbors: basic baseline, null
+### Main Results
 
-These amount to six recipes in total: three that are less multicollinearity averse, and three that are more multicollinearity averse.
+With respect to HR scores, time series cross-validation revealed that ETS was better-performing for 153 countries and ARIMA better for 27 countries. The mean RMSE of these "best" models was approximately 0.188, which compares favorably to the mean RMSEs of the best KNN models (see @tbl-rmses-tune1 and @tbl-rmses-tune2).^[This mean RMSE was computed by 1.) taking the mean RMSE for each best model by country, 2.) multiplying these means by the proportion of observations each country contributes to the dataset, and 3. summing the products. This is done to better approximate the process whereby `tidymodels` computes mean RMSEs, which takes the number of rows---not cases---to be the final denominator.] HR-score predictions for 2020-2023 were successfully rendered from not only these models, but also the best KNN model, which (as aforementioned) relied on ARIMA and ETS models to impute missing data for population and GDP per capita. Each set of predictions are compared in @fig-ts-knn-preds, below:
 
-The performance of these fits on the cross-validation folds, as measured by mean RMSE, are given in @tbl-rmses-base-la and @tbl-rmses-base-ma, below:
+![Time Series vs. KNN Predictions, 2020-2023](plots/scatt_plot_ts_knn.png){#fig-ts-knn-preds}
 
-```{r, echo = FALSE}
-#| label: tbl-rmses-base-la
-#| tbl-cap: "Least Averse - Comparison of Mean RMSEs by Model"
-load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_la.rda"))
-rmse_kbl_base_fits_la
-```
+Generally, the two methods yield similar predictions, although there appears to be more variability where HR scores is average to below-average. Comparing the distribution of each set of predictions evinces even greater differences between the two:
 
-```{r, echo = FALSE}
-#| label: tbl-rmses-base-ma
-#| tbl-cap: "Most Averse - Comparison of Mean RMSEs by Model"
-load(here("data/results/fits_cv/baselines/appendices/rmse_kbl_base_fits_ma.rda"))
-rmse_kbl_base_fits_ma
-```
+![Time Series vs. KNN Density Plots](plots/dens_plot_ts_knn.png){#fig-ts-knn-dens}
 
-The basic baseline (`*_lm`) results seemingly signify a deterioration in quality: vis-à-vis the metrics seen in @tbl-rmses-base, the models perform worse, with gradual yet consistent increases in both mean RMSE and standard error as they become more multicollinearity averse.
-
-If predictive accuracy is the chief objective, then these results suggest that I should not, in fact, proceed with the multicollinearity-averse recipes---irrespective of whether I ultimately use the values produced from my model for inferential tasks. Nevertheless, I am open to feedback that would confirm or challenge my interpretation of or decision-making around this topic.
+In @fig-ts-knn-dens, above, the distribution of the time-series predictions appears exceedingly similar to the distribution of HR scores observed in the original preprocessed dataset (see @fig-hr-dist), being centered at `hr_score == 0` and displaying an additional mode below the center. By contrast, the distribution of the KNN predictions is centered much higher, at approximately `hr_score == 1.3`.
 
 ## Appendices {#sec-appen}
 
