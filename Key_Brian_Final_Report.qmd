@@ -1,5 +1,5 @@
 ---
-title: "Final Project: A Model to Estimate HR Scores (2020-)"
+title: "Final Report: A Model to Estimate HR Scores (2020-)"
 subtitle: |
   | Data Science 2 with R (STAT 301-2)
 author: "Brian Key"
@@ -43,7 +43,9 @@ library(here)
 
 ### Prediction Problem
 
-Two of my three dissertation chapters rely on the use of a dependent variable measuring human rights respect. Hitherto, I have depended on Fariss's Human Rights (HR) Scores,^[For the original article wherein these scores were introduced, see [Fariss, 2014](http://cfariss.com/documents/Fariss2014APSR.pdf).] but he has not updated his dataset since 2020.^[See his [Dataverse page](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for evidence.] This poses a problem insofar as it excludes the most recent country-year observations from my universe of cases entirely.^[That is, it is impossible to evaluate the relationship(s) between independent and dependent variables for cases where the latter is systematically missing.] In my [previous final project](https://github.com/stat301-1-2023-fall/final-project-1-bkey15), and by way of exploratory data analyses (EDAs), I identified a "raw" form of the physical violence index (PVI)---a simple average of the freedoms from political killings and torture indicators featured in the [Varieties of Democracy (V-Dem) dataset](https://v-dem.net/)---as a potential substitute for HR scores. However, for this project, I aim to predict outright the missing data in HR scores whilst more formally appraising the suitability of the raw PVI as a simple substitute for HR scores.
+Two of my three dissertation chapters rely on the use of a dependent variable measuring human rights respect. Hitherto, I have depended on Fariss's Human Rights (HR) Scores,^[For the original article wherein these scores were introduced, see [Fariss, 2014](http://cfariss.com/documents/Fariss2014APSR.pdf).] but he has not updated his dataset since 2020.^[See his [Dataverse page](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for evidence.] This poses a problem insofar as it excludes the most recent country-year observations from my universe of cases entirely.^[That is, it is impossible to evaluate the relationship(s) between independent and dependent variables for cases where the latter is systematically missing.]
+
+In my [previous final project](https://github.com/stat301-1-2023-fall/final-project-1-bkey15), and by way of exploratory data analyses (EDAs), I identified a "raw" form of the physical violence index (PVI)---a simple average of the freedoms from political killings and torture indicators featured in the [Varieties of Democracy (V-Dem) dataset](https://v-dem.net/)---as a potential substitute for HR scores. However, for this project, I aim to predict outright the missing data in HR scores whilst more formally appraising the suitability of the raw PVI as a simple substitute for HR scores.
 
 ### Key Findings
 
