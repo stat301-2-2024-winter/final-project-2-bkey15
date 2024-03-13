@@ -63,8 +63,8 @@ The remainder of my report is organized as follows:
 4.  The results of the baseline fits (@sec-base-fits).
 5.  The results of the tuned fits (@sec-tune-fits).
 6.  The final fit's predictions and an analysis thereof (@sec-final-fit).
-7.  A discussion of time-series predictions and how they compare to those of the final fit (@sec-ts)
-8.  Appendices (@sec-appen)
+7.  A discussion of time-series predictions and how they compare to those of the final fit (@sec-ts).
+8.  Appendices (@sec-appen).
 
 ## Data Overview {#sec-dat-ov}
 
@@ -310,11 +310,11 @@ Before running any models, I preprocess my 1946-2019 data such that it is suitab
 
 The methods I use to construct my time series models are generally set forth in the textbook [Forecasting: Principles and Practice (Hyndman & Athanasopoulos, 2021)](https://otexts.com/fpp3/), which itself makes heavy use of the `fable` and `tsibble` R packages.
 
-First, I use time series cross-validation to compare univariate ARIMA (autoregressive integrated moving average) and ETS (exponential smoothing) models in predicting HR scores, population, and GDP per capita for the period 2020-2023, for all three are systematically missing therein.^[My actual code also predicts GDP, though this is unnecessary given that the variable is removed in the final KNN model. Interestingly, population, GDP, and GDP per capita are Fariss variables as well, and they too have not been updated since 2020. For evidence, see the V-Dem Codebook (V14).] Next, I select the best model for each time series (i.e., country) and render predictions therefrom. Finally, I apply my final fit to the 2020-2023 data---my population and GDP-per-capita predictions having been appended thereto---and compare the predictions from the pure time-series and KNN-model methods.
+First, I use time series cross-validation to compare univariate ARIMA^[Autoregressive integrated moving average] and ETS^[Exponential smoothing] models in predicting HR scores, population, and GDP per capita for the period 2020-2023, for all three are systematically missing therein.^[My actual code also predicts GDP, though this is unnecessary given that the variable is removed in the final KNN model. Interestingly, for the V-Dem dataset, population, GDP, and GDP per capita are Fariss variables as well, and they too have not been updated since 2020. For evidence, see the V-Dem Codebook (V14).] Next, I select the best model for each time series (i.e., country) and render predictions therefrom. Finally, I apply my final fit to the 2020-2023 data---my population and GDP-per-capita predictions having been appended thereto---and compare the predictions from the pure time-series and KNN-model methods.
 
 ### Main Results
 
-With respect to HR scores, time series cross-validation revealed that ETS was better-performing for 153 countries and ARIMA better for 27 countries. The mean RMSE of these "best" models was approximately 0.188, which compares favorably to the mean RMSEs of the best KNN models (see @tbl-rmses-tune1 and @tbl-rmses-tune2).^[This mean RMSE was computed by 1.) taking the mean RMSE for each best model by country, 2.) multiplying these means by the proportion of observations each country contributes to the dataset, and 3. summing the products. This is done to better approximate the process whereby `tidymodels` computes mean RMSEs, which takes the number of rows---not cases---to be the final denominator.] HR-score predictions for 2020-2023 were successfully rendered from not only these models, but also the best KNN model, which (as aforementioned) relied on ARIMA and ETS models to impute missing data for population and GDP per capita. Each set of predictions are compared in @fig-ts-knn-preds, below:
+With respect to HR scores, time series cross-validation revealed that ETS was better-performing for 153 countries and ARIMA better for 27 countries. The mean RMSE of these "best" models was approximately 0.188, which compares favorably to the mean RMSEs of the best KNN models (see @tbl-rmses-tune1 and @tbl-rmses-tune2).^[This mean RMSE was computed by 1.) taking the mean RMSE for each best model by country, 2.) multiplying these means by the proportion of observations each country contributes to the dataset, and 3.) summing the products. This is done to better approximate the process whereby `tidymodels` computes mean RMSEs, which takes the number of rows---not cases---to be $n$, the final denominator.] HR-score predictions for 2020-2023 were successfully rendered from not only these models, but also the best KNN model, which (as aforementioned) relied on ARIMA and ETS models to impute missing data for population and GDP per capita.^[The remaining missing values were imputed through KNN imputation, as dictated by the underlying recipe.] Each set of predictions are compared in @fig-ts-knn-preds, below:
 
 ![Time Series vs. KNN Predictions, 2020-2023](plots/scatt_plot_ts_knn.png){#fig-ts-knn-preds}
 
@@ -322,7 +322,7 @@ Generally, the two methods yield similar predictions, although there appears to 
 
 ![Time Series vs. KNN Density Plots](plots/dens_plot_ts_knn.png){#fig-ts-knn-dens}
 
-In @fig-ts-knn-dens, above, the distribution of the time-series predictions appears exceedingly similar to the distribution of HR scores observed in the original preprocessed dataset (see @fig-hr-dist), being centered at `hr_score == 0` and displaying an additional mode below the center. By contrast, the distribution of the KNN predictions is centered much higher, at approximately `hr_score == 1.3`.
+In @fig-ts-knn-dens, above, the distribution of the time-series predictions appears exceedingly similar to the distribution of HR scores observed in the original preprocessed dataset (see @fig-hr-dist), being centered at 0 and exhibiting an additional mode below the center. By contrast, the distribution of the KNN predictions is centered higher, at approximately 1.3, which seems to comport with Fariss's (2014) finding: that human rights respect is improving over time. Together, these observations suggest that the time-series models are animated by a memorization of the original data---especially vis-à-vis the KNN model, which by construction can allow new data and trends to inform its predictions. Put differently, the time-series models may be exhibiting lower bias yet higher variance, whereas the KNN model may be exhibiting the opposite. As such, my preliminary suspicion is that the KNN model will offer more robust predictions than the time-series models will.
 
 ## Appendices {#sec-appen}
 
@@ -331,4 +331,3 @@ In @fig-ts-knn-dens, above, the distribution of the time-series predictions appe
 ![Distribution of Yeo-Johnson-transformed HR Scores (Density & Box Plots)](plots/appendices/yj_dist_plots.png){#fig-yj}
 
 The transformation does rectify the right-skew seen in @fig-hr-dist, if at the expense of introducing a slight left-skew. It also fails to eliminate the bimodality feature.
-
